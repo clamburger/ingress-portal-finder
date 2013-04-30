@@ -52,8 +52,8 @@ function initialize() {
         var sw = bounds.getSouthWest();
         var ne = bounds.getNorthEast();
         
-        if (Math.abs(ne.lat()-sw.lat()) > 1 || Math.abs(ne.lng()-sw.lng()) > 1.2) {
-          _ob('searchError').innerHTML = "Can't get portals at this zoom level.";
+        if (Math.abs(ne.lat()-sw.lat()) > 1.2 || Math.abs(ne.lng()-sw.lng()) > 1.8) {
+          _ob('searchError').innerHTML = "Area too large. Try zooming in.";
         } else {
           _ob('searchError').innerHTML = "";
         }

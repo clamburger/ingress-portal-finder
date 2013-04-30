@@ -43,8 +43,8 @@ function updateBounds( data ) {
   }
   d = data.bounds;
   if( d && d.length == 2 ) {
-    if( Math.abs(d[1][0] - d[0][0]) > 1.0
-      || Math.abs(d[1][1] - d[0][1]) > 1.2 ) {
+    if( Math.abs(d[1][0] - d[0][0]) > 1.2
+      || Math.abs(d[1][1] - d[0][1]) > 1.8 ) {
       $('#myrange').show();
     }
 
@@ -100,7 +100,7 @@ function view( html, simple ) {
       
     });
 
-    $('#mysubmit').get(0).disabled = false;
+    $('#submitQuery').get(0).disabled = false;
 
     $('.LevelBar:first').css('border-top-width', '2px');
 
@@ -141,7 +141,7 @@ function view( html, simple ) {
         $('#exportCurrent').attr('title', "Export only level "+lv+" portals");
       }
 
-      $('#myexport').attr('lv', lv).css({left: event.pageX, top: event.pageY}).show();
+      $('#myexport').attr('data-level', lv).css({left: event.pageX, top: event.pageY}).show();
 
       event.stopPropagation();
       event.stopImmediatePropagation();
@@ -160,7 +160,7 @@ function view( html, simple ) {
     });
   }
 }
-
+  
 var INED = '<p style="color:#fc6;font-size:10pt">If you\'re already signed in, try pressing "Query" again or perform the following steps: <br/>1) close this window; &nbsp; &nbsp; &nbsp;<br/>2) reload the /intel page;<br/>3) re-open this window. &nbsp;</ol></p>'
 , NOTIFYS = {
   'FAILED': 'Query failed - Sign-In Required!' + INED
@@ -177,7 +177,7 @@ function fail( data ) {
     window.location.reload();
   });
   if( data != 'QUERYING' ) {
-    $('#mysubmit').get(0).disabled = false;
+    $('#submitQuery').get(0).disabled = false;
   }
 }
 
@@ -231,7 +231,7 @@ function filter( results ) {
   }
   var v = $('#mykey').val();
   if( /\S/.test(v) ) {
-    krxp = new RegExp( '(' +v.replace(/^\s+|\s+$/g,'').toLowerCase().replace(/\s*,\s*/g, '|') +')', 'ig' );
+    krxp = new RegExp( '(' +v.replace(/^[\s,]+|[\s,]+$/g,'').toLowerCase().replace(/\s*,\s*/g, '|').replace(/\|{2,}/g, '|') +')', 'ig' ); 
   }
 
   var t = [];
@@ -414,7 +414,7 @@ air.notify = function(data){
           return;
         dupc[v[0]] = true;
         
-        console.log(v);
+        //console.log(v);
 
         // name, addr, lng, lat, team
         var result = {
@@ -563,7 +563,7 @@ $(document).ready(function(){
   }
 
   var drxp = /^\s*\-?\d*\.\d{6}\s*,\s*\-?\d*\.\d{6}\s*$/;
-  $('#mysubmit').click( function(){
+  $('#submitQuery').click( function(){
     if( !drxp.test( $('#mymin').val() ) ) {
       return $('#mymin').focus();
     }
@@ -573,8 +573,8 @@ $(document).ready(function(){
 
     var bounds = ($('#mymin').val() +',' +$('#mymax').val()).replace(/\s+/g, '');
     var m = bounds.split(/\s*,\s*/);
-    if( Math.abs(parseFloat(m[0]) - parseFloat(m[2])) > 1.0
-      || Math.abs(parseFloat(m[1])-parseFloat(m[3])) > 1.2 ) {
+    if( Math.abs(parseFloat(m[0]) - parseFloat(m[2])) > 1.2
+      || Math.abs(parseFloat(m[1])-parseFloat(m[3])) > 1.8 ) {
       $('#myrange').show();
       return false;
     }
@@ -658,13 +658,16 @@ $(document).ready(function(){
   });
 
   $('#myexport a').click(function(){
+    window.butt = $(this);
     var lv = $(this).parent().attr('data-level');
     if( !lv ) {
+      console.log($(this));
       return $(this).removeAttr('href');
     }
     var now = new Date();
     var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate();
     if( $(this).html() == 'All' ) {
+      console.log("All");
       $(this).attr('download', 'Ingress-Portals-'+timeStr+'.kml');
       $(this).attr('href', kml($('#withimage:checked').length>0));
     } else {

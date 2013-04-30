@@ -22,6 +22,7 @@
       line-height: 1.6em;
       border: 1px rgb(32,168,177) solid;
       min-width: 680px;
+      overflow-y: scroll;
     }
     
     a {
@@ -62,12 +63,34 @@
 
     /*** Area and Filter inputs ***/
 
-    input[type='text'] {
+    input {
       font-family: coda_regular, sans-serif;
       font-size: 1.0em;
       text-align: center;
+    }
+
+    input[type='text'] {
       color: #ffce00;
       height: 2em;
+    }
+    
+    input[type='button'] {
+      padding: 5px;
+      margin: 0px;
+    }
+    
+    #submitQuery {
+      width: 100px;
+      background-color: #6699ff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      line-height: 1.6em;
+    }
+
+    #submitQuery:hover {
+      background-color: #3300ff;
+      color: #33ffff;
     }
     
     .tron {
@@ -83,10 +106,10 @@
     }
 
     .enlightened {
-      color: #66ff66;
+      color: #03fe03;
     }
     .resistance {
-      color: #6699ff;
+      color: #00c5ff;
     }
     .neutral {
       color: silver;
@@ -174,20 +197,6 @@
       color: #000;
     }
 
-    #mysubmit {
-      width: 100px;
-      height: 2em;
-      background-color: #6699ff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    #mysubmit:hover {
-      background-color: #3300ff;
-      color: #33ffff;
-    }
-
     h1 {
       text-align: center;
       cursor: default;
@@ -196,18 +205,6 @@
     #myair {
       width: 600px;
       margin: 0 auto;
-    }
-
-    #about {
-      position: fixed;
-      top: 2px;
-      right: 6px;
-      color:#555;
-      font-size: 9pt;
-      text-decoration: none;
-    }
-    #about:hover {
-      color:#00ccff;
     }
 
     #mystage {
@@ -465,7 +462,7 @@
         </label>
         <input type="text" id="mymin" class="tron showMap" value="-27.896639,152.229687" /> -
         <input type="text" id="mymax" class="tron showMap" value="-27.068193,153.877636" />
-        <input type="button" value=" Query " id="mysubmit" />
+        <input type="button" value="Query" id="submitQuery" />
       </li>
       
       <li>
