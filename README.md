@@ -8,7 +8,7 @@ A handy extension used to get a list of [Ingress](http://ingress.com) portals in
 Installation
 -------------------
 
-1. Download the [.crx file](https://raw.github.com/clamburger/ingress-portals-finder/master/build/ingress-portals-finder.crx) to your machine
+1. Download the [.crx file](https://raw.github.com/clamburger/ingress-portal-finder/master/build/ingress-portal-finder.crx) to your machine
 2. Open [chrome://extensions](chrome://extensions)
 3. Drag the .crx file you download onto the extensions page
 
@@ -17,7 +17,7 @@ Once installed, the extension should stay automatically updated.
 Usage
 ----------------------
 1. Open the [Ingress Intel Map](http://ingress.com/intel)
-2. Hit the button on your toolbar that looks like this ![Extension button](https://raw.github.com/clamburger/ingress-portals-finder/master/icons/16.png)
+2. Hit the button on your toolbar that looks like this ![Extension button](https://raw.github.com/clamburger/ingress-portal-finder/master/icons/16.png)
 
 Update History
 -------------------
