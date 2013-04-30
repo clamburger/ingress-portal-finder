@@ -232,7 +232,7 @@
       border-radius: 8px;
       margin: 6px 8px 12px 8px;
       float: left;
-      padding: 12px 8px;
+      padding: 6px 8px;
       width: 300px;
       overflow: hidden;
     }
@@ -258,7 +258,7 @@
     .a-locate, .a-scene, .a-status {
       float: left;
       padding: 4px;
-      height: 200px;
+      height: 175px;
     }
 
     .a-locate {
@@ -276,7 +276,7 @@
       background-size: contain;
       background-repeat: no-repeat;
       width: 100%;
-      height: 200px;
+      height: 175px;
       cursor: pointer;
     }
 
@@ -301,6 +301,8 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-align: center;
+      padding-bottom: 4px;
     }
 
     .iALIENS {
@@ -352,6 +354,8 @@
       display: block;
       text-align: center;
       position: relative;
+      height: 30px;
+      line-height: 30px;
     }
 
     .LevelBar b {
@@ -498,13 +502,12 @@ Thanks to Niantic Labs for making this all possible</span>
       <% for (i = 0; i < list.length; i ++) { %>
   <%= list[i].LevelBar || '' %>
   <div class="portal i<%= list[i].team %>">
+  <div class="name"><%= list[i].name %></div>
     <ul>
       <li class="a-locate">
-  <div class="name"><%= list[i].name %></div>
-
   <div class="point">
   <a class="map" target="_blank" href="http://maps.google.com/maps?q=<%= list[i].nameV %>@<%= list[i].lat %>,<%= list[i].lng %>" level="<%= list[i].level %>" team="<%= list[i].team %>"></a>
-  <a class="ingr" target="_blank" href="http://www.ingress.com/intel?latE6=<%= list[i].latE6 %>&lngE6=<%= list[i].lngE6 %>&z=17"></a>
+  <a class="ingr" target="_blank" href="http://www.ingress.com/intel?latE6=<%= list[i].latE6 %>&lngE6=<%= list[i].lngE6 %>&z=17&pguid=<%= list[i].id %>"></a>
   </div>
   <div class="resonators" title="Resonators"><%= list[i].resonators.join('')||'-' %></div>
   <div class="status">
@@ -532,11 +535,11 @@ Thanks to Niantic Labs for making this all possible</span>
   <style>
   #mymap {
     position: fixed;
-    top: 100px;
+    top: 75px;
     left: 60px;
     width: 600px;
-    height: 376px;
-    border: 6px solid #ccc;
+    height: 450px;
+    border: 6px solid rgb(32,168,177);
     background-color: #222;
     border-radius: 8px;
   }
@@ -558,13 +561,14 @@ Thanks to Niantic Labs for making this all possible</span>
   #myoff:hover {
     color: #ff0;
     background-color: #f00;
+    text-decoration: none;
   }
   #mapfr {
-    height: 340px;
+    height: 413px;
     width: 100%;
   }
 
-  #mybounds, #bigmap,#myall {
+  #mybounds {
     display: block;
     width: 200px;
     border-radius: 6px;
@@ -583,9 +587,9 @@ Thanks to Niantic Labs for making this all possible</span>
     bottom: 5px;
   }
 
-  #mybounds:hover, #bigmap:hover,#myall:hover {
-    background-color: #f00;
-    color: #fff;
+  #mybounds:hover {
+    background-color: #3300ff;
+    color: #33ffff;
   }
   #myrange {
     position: absolute;
@@ -605,9 +609,7 @@ Thanks to Niantic Labs for making this all possible</span>
     <iframe id="mapfr" frameBorder="0"></iframe>
     <div id="mapbar">
       <a id="myoff">×</a>
-      <a id="mybounds">Get Bounds</a>
-      <a id="bigmap" target="_blank" style="display:none">View Map Alone</a>
-      <a id="myall" style="display:none">All</a>
+      <a id="mybounds">Use This Viewport</a>
     </div>
   </div>
   <style>

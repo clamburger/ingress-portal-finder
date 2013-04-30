@@ -13,26 +13,56 @@
     }
     html, body {
       font-family: coda_regular, sans-serif;
+      color: white;
       height: 100%;
       margin: 0;
       padding: 0
     }
-    #mindon_ingr_map { height: 100% }
+    #google_map {
+      width: 100%;
+      height: 372px;
+    }
 
-    #myquery {padding: 4px 12px;background-color: rgb(102, 175, 255);border-radius: 4px;width:145px;opacity:0.6;position:fixed;top:2px;left:228px;}
-    #myquery input {border:1px solid #666;}
-    #mycity {width: 120px;border-radius:3px 0 0 3px; border-right:none;}
-    #mysearch {border-radius: 0 3px 3px 0; margin:0;background:#333;color:#fff;}
-    #mysearch:hover {background:#600;}
-    #myerr {color:#fff;text-align:center;font-size:9px}
-
+    #header {
+      padding: 4px 12px
+    }
+    #header input {
+      border: 1px solid rgb(32, 168, 177);
+      background-color: rgba(0,0,0,0.3);
+      line-height: 1.6em;
+      font-size: 1.0em;
+    }
+    #mycity {
+      width: 200px;
+      border-radius: 4px 0 0 4px;
+      color: #ffce00;
+      margin-left: 5px;
+      padding-left: 4px;
+    }
+    #mysearch {
+      border-radius: 0 4px 4px 0;
+      color: white;
+      margin-left: 0px;
+      border-left-style: none !important;
+    }
+    #mysearch:hover {
+      background-color: rgb(32, 168, 177);
+      font-weight: bold;
+    }
+    #searchError {
+      color: red;
+    }
     </style>
     <script src="jquery.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4gicXAqJPm1P1A9cEZKh-ZEChBQbeOWI&sensor=true"></script>
     <script src="map.js"></script>
   </head>
   <body onload="initialize()">
-    <div id="mindon_ingr_map" style="width:100%; height:100%"></div>
-    <div id="myquery" style="display:none"><div id="myerr"></div><input type="text" id="mycity" placeholder="Place Keyword"/><input id="mysearch" type="button" value=">" /></div>
+    <div id="header" style="display:none;">
+      <label for="mycity">Search:</label> <input type="text" id="mycity" class="tron" placeholder="Enter location" /><input id="mysearch" type="button" value=">" />
+      <span id="searchError"></span>
+    </div>
+    <div id="google_map">
+    </div>
   </body>
 </html>

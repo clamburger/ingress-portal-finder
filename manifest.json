@@ -3,7 +3,7 @@
   
   "name": "Ingress Portal Finder (Über Edition)",
   "description": "Locates portals in Ingress.",
-  "version": "1.0",
+  "version": "1.0.1",
   
   "permissions": [
     "http://www.ingress.com/*",
@@ -45,7 +45,7 @@
     "run_at": "document_start"
   }],
   
-  "homepage_url": "https://github.com/clamburger/ingress-portals-finder",
-  "update_url": "https://raw.github.com/clamburger/ingress-portals-finder/master/ingr-updates.xml"
+  "homepage_url": "https://github.com/clamburger/ingress-portal-finder",
+  "update_url": "https://raw.github.com/clamburger/ingress-portal-finder/master/ingr-updates.xml"
   
 }

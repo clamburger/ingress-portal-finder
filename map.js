@@ -1,4 +1,6 @@
 var ingr, geoc, target = '*', lastd;
+var center;
+var firstTime = true;
 
 function _ob(id){return document.getElementById(id);}
 
@@ -10,18 +12,19 @@ function initialize() {
      var mapOptions = {
        center: new google.maps.LatLng(-27.47281, 153.02791),
        zoom: 12,
-       mapTypeId: google.maps.MapTypeId.ROADMAP
+       mapTypeId: google.maps.MapTypeId.ROADMAP,
+       streetViewControl: false,
      };
-     ingr = new google.maps.Map(_ob("mindon_ingr_map"),
+     ingr = new google.maps.Map(_ob("google_map"),
          mapOptions);
 
      geoc = new google.maps.Geocoder();
-     _ob('myquery').style.display = 'block';
+     _ob('header').style.display = 'block';
     
      parent.postMessage('map-ready', target);
 
      _ob('mysearch').onclick = function(){
-       _ob('myerr').innerHTML = '';
+       _ob('searchError').innerHTML = '';
        var val = _ob('mycity').value;
        if(/^\s*$/.test(val)) {
          return _ob('mycity').focus();
@@ -34,7 +37,7 @@ function initialize() {
               position: results[0].geometry.location
             });
           } else {
-            _ob('myerr').innerHTML = 'Failed to locate';
+            _ob('searchError').innerHTML = "Couldn't find location.";
           }
         });
      };
@@ -43,15 +46,40 @@ function initialize() {
         _ob('mysearch').onclick();
       }
      };
+     
+     function checkBounds() {
+        var bounds = ingr.getBounds();
+        var sw = bounds.getSouthWest();
+        var ne = bounds.getNorthEast();
+        
+        if (Math.abs(ne.lat()-sw.lat()) > 1 || Math.abs(ne.lng()-sw.lng()) > 1.2) {
+          _ob('searchError').innerHTML = "Can't get portals at this zoom level.";
+        } else {
+          _ob('searchError').innerHTML = "";
+        }
+          
+        //console.log("Vert: "+(ne.lat()-sw.lat())+", Horiz: "+(ne.lng()-sw.lng()));
+      }
+     
+      google.maps.event.addListener(ingr, "zoom_changed", checkBounds);
+      google.maps.event.addListener(ingr, "bounds_changed", checkBounds);
+      
+      // This bit of code makes sure the map is properly centered when the iframe is first loaded
+      var listener = google.maps.event.addListener(ingr, "center_changed", function() {
+        google.maps.event.removeListener(listener);
+        ingr.setCenter( center );
+        console.log("Map centered");
+      });
+     
    } catch(e){
      return parent.postMessage('map-failed', target);
    }
 }
 
-
 var marker;
 window.addEventListener('message', function(event) {
-
+  console.log("Received message");
+  console.log(event.data);
   var d = event.data;
   if( !ingr || !window.google || !google.maps ) {
     if( d && d.x !== undefined )
@@ -126,7 +154,7 @@ function process(d){
   });
 
   if( d.title ) {
-    document.getElementById('myquery').style.display = 'none';
+    document.getElementById('header').style.display = 'none';
     var infowindow = new google.maps.InfoWindow({
         content: '<div style="color:'+(tn=='a'?'#060':(tn=='r'?'#309':'#000'))+'">'+d.title+'</div>'
     });
@@ -137,9 +165,13 @@ function process(d){
       infowindow.open(ingr, marker);
     });
   } else {
-    document.getElementById('myquery').style.display = '';
+    document.getElementById('header').style.display = '';
     ingr.setZoom( d.zoom || 12 );
   }
 
-  ingr.setCenter( myLatlng );
+  center = myLatlng;
+  if (!firstTime) {
+    ingr.setCenter( myLatlng );
+  }
+  firstTime = false;
 }

@@ -86,7 +86,7 @@ function view( html, simple ) {
         var alien = st['ALIENS'] || 0;
         
         if (v == 0) {
-          $(this).html('<span class="neutral">'+neutral+' portal'+s(neutral)+'</span>');
+          $(this).html('<span>'+neutral+' portal'+s(neutral)+'</span>');
         } else {
         var c = (st['ALIENS']||0) + (st['RESISTANCE']||0) +(st['NEUTRAL']||0);
 
@@ -413,9 +413,12 @@ air.notify = function(data){
         if(!d || deleted[v[0]] || !d.resonatorArray || dupc[v[0]])
           return;
         dupc[v[0]] = true;
+        
+        console.log(v);
 
         // name, addr, lng, lat, team
         var result = {
+          id: v[0],
           name: d.portalV2 && d.portalV2.descriptiveText ? d.portalV2.descriptiveText.TITLE || 'No Name' : 'No Name'
          ,addr: d.portalV2 && d.portalV2.descriptiveText ? d.portalV2.descriptiveText.ADDRESS || '-' : '-'
          ,lngE6: d.locationE6.lngE6
@@ -435,9 +438,12 @@ air.notify = function(data){
         // resonators
         var i = 0;
         if( d.resonatorArray && d.resonatorArray.resonators ) {
+        
           d.resonatorArray.resonators.forEach(function(r){
-            if( !r )
+            if( !r ) {
+              result.resonators[i++] = "-";
               return;
+            }
             var level = r.level || 0;
             result.resonators[i++] = level;
             result.level += level;
@@ -608,7 +614,6 @@ $(document).ready(function(){
     }
     if( mapWin ) {
       $('#mybounds').show();
-      $('#bigmap,#myall').hide();
       $('#mymap').show();
 
       var dxp = /^[\.\-\d]+,[\.\-\d]+$/;
@@ -644,10 +649,6 @@ $(document).ready(function(){
   $('#allev').click(function(){
     $('#mylevels a').addClass('active');
     render();
-  });
-
-  $('#myall').click(function(){
-    window.open('all-fr.html', 'all_portals');
   });
 
   $('#mytry').click(function(){
@@ -688,12 +689,6 @@ function updateMap() {
         var d = $(this).data('map');
         $('#mymap').show();
         $('#mybounds').hide();
-        $('#bigmap').attr('href', $(this).data('url')).show();
-        if( !air.all ) {
-          $('#myall').show();
-        } else {
-          $('#myall').hide();
-        }
         air.level = d.level;
         d.lvi = air.lvi;
         mapWin.postMessage( d, '*' );

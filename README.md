@@ -21,4 +21,5 @@ Usage
 
 Update History
 -------------------
+* v1.0.1: significant usability improvements to the map view and a few appearance tweaks to resonators and portal names in the portal list
 * v1.0: forked from [mindon](https://github.com/mindon/ingress-portals-finder)'s extension. Changes are fairly minor, consisting primarily of aesthetic updates and anti-Enlightened propaganda.
