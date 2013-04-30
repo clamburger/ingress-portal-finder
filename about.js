@@ -1,11 +1,5 @@
-function idonate(key) {
-  var fm = document.getElementById('fmdonate');
-  fm['hosted_button_id'].value = key;
-  fm.submit();
-}
-
-document.getElementById('mydonate').onclick = function(){
-  idonate('YSVEJMBLM3AFG');
+document.getElementById('smallicon').onclick = function(){
+  alert("Not this one you silly goose");
 };
 
-window.oncontextmenu = function(event){return false};
+$("#version").html("v"+chrome.app.getDetails().version);

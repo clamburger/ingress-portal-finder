@@ -1,11 +1,11 @@
 var ready, dr, portals, levels, nzlevel, teams, stat, tid, tn = 0;
 var EnergyMax = [0, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 6000 ];
 var air = chrome.extension.getBackgroundPage();
-var mapWin, center = [22.528176, 113.928448];
+var mapWin, center = [-27.47281, 153.02791];
 
 var vs = {}, vsc = {}, sortKey;
 
-window.oncontextmenu = function(){return false};
+$("#version").html("v"+chrome.app.getDetails().version);
 
 window.addEventListener('message', function(event) {
   if( event.data == 'render-ready' ) {
@@ -53,11 +53,19 @@ function updateBounds( data ) {
   }
 }
 
+function s(num) {
+  if (num != 1) {
+    return "s";
+  }
+  return "";
+}
+
 function view( html, simple ) {
   $('.LevelBar div[class]').unbind('click');
   $('.scene[u],a.map,#myreload').unbind('click');
 
   $('#mystage').html( html );
+  $('#mystage').append("<br clear='all'>");
   
   if( !simple ) {
     $('.portal .addr, .portal .name').each(function(){
@@ -66,17 +74,30 @@ function view( html, simple ) {
       }
     });
 
-    $('.stat[lv]').each(function(){
-      var v = $(this).attr('lv');
+    // Update the portal count on the right hand side of each level bar
+    $('.stat[data-level]').each(function(){
+      var v = $(this).attr('data-level');
+      
       if( stat[v] ) {
-        var st = stat[v]
-          , c = (st['ALIENS']||0) + (st['RESISTANCE']||0) +(st['NEUTRAL']||0);
+      
+        var st = stat[v];
+        var neutral = st['NEUTRAL'] || 0;
+        var resist = st['RESISTANCE'] || 0;
+        var alien = st['ALIENS'] || 0;
+        
+        if (v == 0) {
+          $(this).html('<span class="neutral">'+neutral+' portal'+s(neutral)+'</span>');
+        } else {
+        var c = (st['ALIENS']||0) + (st['RESISTANCE']||0) +(st['NEUTRAL']||0);
 
-        $(this).html(c +' = <label class="enlightened">' +(st['ALIENS']||0) +'</label> + <label class="resistance">'
-          + (st['RESISTANCE']||0) +'</label> + <label class="neutral">' +(st['NEUTRAL']||0) +'</label>');
+        $(this).html('<span class="enlightened" title="Enlightened portals">'+alien+'</span> + '
+          + '<span class="resistance" title="Resistance portals">'+resist+'</span> = '+c+' portal'+s(c));
+        }
+        
       } else {
         $(this).html('');
       }
+      
     });
 
     $('#mysubmit').get(0).disabled = false;
@@ -110,10 +131,17 @@ function view( html, simple ) {
       }
 
       var offset = $(this).offset()
-        , lv = $(this).attr('lv');
-      $('#myexport b').html( lv );
+        , lv = $(this).attr('data-level');
+        
+      if (lv == 0) {
+        $('#exportCurrent').html( "Unclaimed" );
+        $('#exportCurrent').attr('title', "Export only unclaimed portals");
+      } else {
+        $('#exportCurrent').html( "Level " + lv );
+        $('#exportCurrent').attr('title', "Export only level "+lv+" portals");
+      }
 
-      $('#myexport').attr('lv', lv).css({right: 4, top: offset.top -36}).show();
+      $('#myexport').attr('lv', lv).css({left: event.pageX, top: event.pageY}).show();
 
       event.stopPropagation();
       event.stopImmediatePropagation();
@@ -125,19 +153,19 @@ function view( html, simple ) {
         return false;
       }
       var now = new Date()
-        , timestr = 'T'+ (now.getMonth() > 8 ? '' : '0') + (1+now.getMonth()) +(now.getDate() > 9 ? '' : '0') + now.getDate();
-      var lv = $(this).attr('lv');
-      $(this).attr('download', 'Ingress-IPf-Level-'+lv+'-'+timestr+'.csv');
+      var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate();
+      var lv = $(this).attr('data-level');
+      $(this).attr('download', 'Ingress-Portals-Level-'+lv+'-'+timeStr+'.csv');
       $(this).attr('href', csv(true, lv));
     });
   }
 }
 
-var INED = '<p style="color:#fc6;font-size:10pt">If already in, try "Query" again or following steps: <br/>1) close this window; &nbsp; &nbsp; &nbsp;<br/>2) reload the /intel page;<br/>3) re-open this window. &nbsp;</ol></p>'
+var INED = '<p style="color:#fc6;font-size:10pt">If you\'re already signed in, try pressing "Query" again or perform the following steps: <br/>1) close this window; &nbsp; &nbsp; &nbsp;<br/>2) reload the /intel page;<br/>3) re-open this window. &nbsp;</ol></p>'
 , NOTIFYS = {
-  'FAILED': 'Query Failed - Sign-In Required!' + INED
+  'FAILED': 'Query failed - Sign-In Required!' + INED
  ,'INVALID': 'Invalid Query!'
- ,'QUERYING': 'Querying Portals, It Takes Time ...<div class="spinning"><div class="ball"></div><div class="ball1"></div></div>'
+ ,'QUERYING': 'Querying portals, please wait...<div class="spinning"><div class="ball"></div><div class="ball1"></div></div>'
  ,'NOAUTH': 'Sign-In Required!' + INED
  ,'ERROR': 'Query Error! [ <a id="myreload">Reload</a> ]'
  ,'UNKNOWN': 'Unknown Error! [ <a id="myreload">Reload</a> ]'
@@ -228,7 +256,14 @@ function filter( results ) {
       , n = 0;
 
     if( idx ) {
-      var LevelBar = '<div class="LevelBar"><div class="note"><div class="level" style="height:11px;background-position:0 -98px"></div>Level <div class="energy" style="height:11px;background-position:-16px -98px"></div>Energy <div class="links" style="height:11px;background-position:-32px -98px"></div>Links  <div class="mods" style="height:11px;background-position:-48px -98px"></div>Mods</div>Level - <b>' + v +'</b> &nbsp;<span class="stat" lv="'+v+'"></span><div class="export" lv="'+v+'" title="Export KML">KML</div><a class="export-csv" lv="'+v+'" title="Export Current Level as CSV">CSV</a></div>';
+      var title;
+      if (v == 0) {
+        title = '<b>Unclaimed</b>';
+      } else {
+        title = '<b>Level '+v+'</b>';
+      }
+      
+      var LevelBar = '<div class="LevelBar"><div class="note"><div class="level" style="height:11px;background-position:0 -98px"></div>Level <div class="energy" style="height:11px;background-position:-16px -98px"></div>Energy <div class="links" style="height:11px;background-position:-32px -98px"></div>Links  <div class="mods" style="height:11px;background-position:-48px -98px"></div>Mods</div>'+title+' &mdash; Export <a class="export" data-level="'+v+'" title="Export KML">KML</a> or <a class="export-csv" data-level="'+v+'" title="Export Current Level as CSV">CSV</a><span class="stat" data-level="'+v+'"></span></div>';
       if( sortKey && sortFn ) {
         idx.sort(sortFn);
       }
@@ -320,7 +355,7 @@ function render() {
   if( r && r.length > 0 ) {
     dr.postMessage({result: {list: r}}, '*');
   } else {
-    view( '<div class="notify">No Portals Matched This Level</div>', true );
+    view( '<div class="notify">No portals found with this level.</div>', true );
   }
 }
 
@@ -332,7 +367,18 @@ air.notify = function(data){
   tn = 0;
   tid && clearTimeout(tid);
   if( !data || typeof data == 'string' ) {
-    fail(data);
+    data = JSON.parse(data);
+    
+    console.log("Received data: ");
+    console.log(data);
+    
+    if (data.hasOwnProperty("error")) {
+      fail(data.error);
+    } else if (data.hasOwnProperty("resistance")) {
+      if (!data.resistance) {
+        $("body").addClass("aliens");
+      }
+    }
 
   } else {
     sortKey = '';
@@ -473,17 +519,7 @@ air.notify = function(data){
   }
 };
 
-function idonate(key) {
-  var fm = document.getElementById('fmdonate');
-  fm['hosted_button_id'].value = key;
-  fm.submit();
-}
-
 $(document).ready(function(){
-  $('#about').click(function(){
-    window.open('about.html');
-  });
-
   $('#mylevels a').click(function(event) {
     if( event.ctrlKey ) {
       $(this).toggleClass('active');
@@ -565,7 +601,8 @@ $(document).ready(function(){
   // map
   $('#mapfr').attr('src', 'map.html');
 
-  $('#places,#mymin,#mymax').click(function(event) {
+  $('.showMap').click(function(event) {
+    event.preventDefault();
     if($('#mymap:visible').length) {
       return $('#mymap:visible').hide();
     }
@@ -620,24 +657,21 @@ $(document).ready(function(){
   });
 
   $('#myexport a').click(function(){
-    var lv = $(this).parent().attr('lv');
+    var lv = $(this).parent().attr('data-level');
     if( !lv ) {
       return $(this).removeAttr('href');
     }
-    var now = new Date()
-      , timestr = 'T'+ (now.getMonth() > 8 ? '' : '0') + (1+now.getMonth()) +(now.getDate() > 9 ? '' : '0') + now.getDate();
+    var now = new Date();
+    var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate();
     if( $(this).html() == 'All' ) {
-      $(this).attr('download', 'Ingress-IPf-Level-A-'+timestr+'.kml');
+      $(this).attr('download', 'Ingress-Portals-'+timeStr+'.kml');
       $(this).attr('href', kml($('#withimage:checked').length>0));
     } else {
-      $(this).attr('download', 'Ingress-IPf-Level-'+lv+'-'+timestr+'.kml');
+      $(this).attr('download', 'Ingress-Portals-Level-'+lv+'-'+timeStr+'.kml');
       $(this).attr('href', kml($('#withimage:checked').length>0,lv));
     }
   });
 
-  $('#mydonate').click(function(){
-    idonate('YSVEJMBLM3AFG');
-  });
 });
 
 function updateMap() {

@@ -2,68 +2,62 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="author" content="mindon/at/gmail.com" site="http://mindon.github.com/">
     <title>
-Ingress Portals Finder  - Mindon.IDEA
+      Ingress Portal Finder (Über Edition)
     </title>
 
     <style type="text/css">
-@font-face {
-    font-family: coda_regular;
-  src: url(fonts/coda_regular.ttf);
-}
-html, body {
-  font-family: coda_regular, sans-serif;
-  background-color:#222;
-  color: #fff;
-  font-size: 11pt;
-  line-height: 1.6em;
-}
-body {
-  text-align: center;
-  cursor: default;
-}
+    @font-face {
+      font-family: coda_regular;
+      src: url(fonts/coda_regular.ttf);
+    }
+    html {
+      height: 95%;
+    }
+    body {
+      font-family: coda_regular, sans-serif;
+      background-color: rgb(8, 48, 78);
+      color: #ffffff;
+      font-size: 11pt;
+      line-height: 1.6em;
+      border: 1px rgb(32,168,177) solid;
+      height: 100%;
+    }
+    body {
+      text-align: center;
+      cursor: default;
+    }
 
-a {
-  color: #3399ee;
-}
+    a {
+      color: rgb(255, 206, 0);
+      text-decoration: none;
+    }
 
-a:hover {
-  color: #ff9900;
-}
-.alpha {
-  opacity: 0.5;
-}
-sup {font-size:9pt;color:#999;}
-#mydonate {
-  color: #555;
-  font-size: 10pt;
-  cursor:pointer;
-  margin-left: 1.2em;
-}
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    b {
+      color: rgb(0, 197, 255);
+    }
+    
+    h1 sup {
+      font-size: 50%;
+    }
     </style>
   </head>
 <body>
-<h1>About Ingress Portals Finder <sup>V1.3.11</sup></h1>
-<a href="http://mindon.github.com" target="_blank"><img title="Design & Developed By Mindon Feng" src="128.png" border="0" /></a>
-<p style="color:red">Usage:  <br/>
-1. Sign in <a href="http://www.ingress.com/intel" target="_blank">NianticLabs@Google Ingress Site</a> and click icon <img src="20.png" align="absmiddle">;
-<br/>
-2. Set Bounds and Click "Query".
-</ol>
-<!-- https://chrome.google.com/webstore/detail/ingress-portals-finder/pglalnoakjpjaaobdjabdkedimkdnegk?hl=en-US&from=appself -->
-<p>The blog provides <a id="myurl" href="http://mindon.github.com/blog/2013/01/26/incredible-ingress-portals-finder-a-chrome-extension-for-the-game/" target="_blank">latest CRX file</a> for manual installation <a id="mydonate" title="Inspire Me!">DONATE 0.99</a></p>
+<h1>Ingress Portal Finder (Über Edition) <sup id="version"></sup></h1>
+<img alt="Logo" src="icons/128.png" border="0" />
+<p style="color:red">To use this extension, open the <a href="http://www.ingress.com/intel" target="_blank">Ingress Intel Map</a> and click the icon &rarr; <img src="icons/16.png" align="absmiddle" id="smallicon"></p>
 
-<p>&nbsp;</p>
-<p class="alpha">Developed by <b>Mindon Feng</b> from <a href="http://mindon.github.com" target="_blank">Mindon.IDEA</a><br /><span style="font-size:10pt;color:#999">with Javascript/HTML5/ NodeJs/ MongoDB/ PhoneGap skills and learning <a href="http://golang.org" target="_blank">Go</a> Language<br />Who Enjoy Developing <a href="http://teespring.com/nodejs" target="_blank">NodeJS</a> Apps and <a href="https://chrome.google.com/webstore/search/Mindon?hl=en-US" target="_blank">Chrome Apps</a> &amp; <a href="https://chrome.google.com/webstore/search-extensions/Mindon?hl=en-US" target="_blank">Extensions</a> :-)</span></p>
+<p>Developed by <a href="http://github.com/clamburger">Sam Horn</a> for the <b>Queensland Resistance</b><br />
+<span style="font-size:10pt;color:#999">Based on <a href="https://github.com/mindon/ingress-portals-finder">work</a> by <a href="http://mindon.github.com">Mindon Feng</a> with inspiration from <a href="http://iitc.jonatkins.com/">IITC</a><br>
+Thanks to Niantic Labs for making this all possible</span>
 
-<p class="alpha" style="font-size:10pt">Thanks <a href="http://www.ingress.com" target="_blank">NianticLabs@Google</a>, and <a href="http://http://blog.shawtim.com/" target="_blank">ShawTim</a> for "Ingress: HK Portal List Extension".</p>
+<p>"Audax at Fidelis"</p>
 
-<form id="fmdonate" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style="display:none">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="HCJSW6U8PUNEJ">
-</form>
-
+<script src="jquery.js"></script>
 <script src="about.js"></script>
 </body>
 </html>

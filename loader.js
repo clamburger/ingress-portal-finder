@@ -30,7 +30,7 @@ function tabClicked(tab) {
       try{chrome.tabs.remove([aw.id]);}catch(e){}
     }
 
-    chrome.windows.create({'url': 'about.html', 'type': 'popup', 'width': 720, 'height':570, 'focused': true}
+    chrome.windows.create({'url': 'about.html', 'type': 'popup', 'width': 720, 'height':420, 'focused': true}
     , function(chromeWindow) {
       aw = chromeWindow.tabs[0];
       chromeWindow.alwaysOnTop = true;

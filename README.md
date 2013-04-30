@@ -1,71 +1,24 @@
-ingress-portals-finder
+Ingress Portal Edition (Über Edition)
 ======================
 
-a Chrome Extension for the Game - Ingress
+A handy extension used to get a list of [Ingress](http://ingress.com) portals in a certain area.
 
+**This extension is not officially affiliated with Ingress or Niantic Labs at Google. Using this extension is likely to be considered against the Ingress Terms of Service. Any use is at your own risk.**
 
-Updates
---------------------
-v1.3.10 fix https bug & provide auto-update feature
+Installation
+-------------------
 
+1. Download the [.crx file](https://raw.github.com/clamburger/ingress-portals-finder/master/build/ingress-portals-finder.crx) to your machine
+2. Open [chrome://extensions](chrome://extensions)
+3. Drag the .crx file you download onto the extensions page
 
-Inspire Me :-)
---------------------
-If you found this project useful, please donate.
-[[Donate 0.99$ - by Paypal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YSVEJMBLM3AFG)]
+Once installed, the extension should stay automatically updated.
 
-
-Usage Details
+Usage
 ----------------------
-<http://mindon.github.com/blog/2013/01/26/incredible-ingress-portals-finder-a-chrome-extension-for-the-game/>
+1. Open the [Ingress Intel Map](http://ingress.com/intel)
+2. Hit the button on your toolbar that looks like this ![Extension button](https://raw.github.com/clamburger/ingress-portals-finder/master/icons/16.png)
 
-There's the link for the latest build CRX file.
-
-
-**Easy Usage**: 1) Set Bounds; 2) Click Query; 3) Filter by Tag, Team or Level.
-
-
-Features
-----------------------
--   Set Bounds more easily - Search place by name
-
--   Filtering by name/address keyword, team or level
-
--   Locate portal in google map or ingress intel map
-
--   Level, Enery, Links and Mods status bar
-
--   Portal photo (click to view in full mode)
-
--   Sort by Energy/Links/Mods
-
--   Export selected level or all levels to KML/CSV
-
--   Team vs. status by level in the bounds
-
-
-Note
-----------------------
-
-The extension had been taken down from the [Chrome Web Store](https://chrome.google.com/webstore) due to
-
-> Your Google Chrome item, "Ingress Portals Finder," did not comply with our policies on [Prohibited Products](https://developers.google.com/chrome/web-store/program_policies) and was removed from the Google Chrome Web Store. 
-
-
-How to packaging the Chrome Extension
-----------------------
-<http://developer.chrome.com/extensions/packaging.html>
-
-
-
-CRX FILE MANUAL INSTALL STEPS
------------------------------
-1.   Download and save the CRX file
-
-2.   open chrome://extensions/
-
-3.   Drag and drop the CRX file in the window…
-
-
-
-Please keep the about information in your copy, thanks.
+Update History
+-------------------
+* v1.0: forked from [mindon](https://github.com/mindon/ingress-portals-finder)'s extension. Changes are fairly minor, consisting primarily of aesthetic updates and anti-Enlightened propaganda.

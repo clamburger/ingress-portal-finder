@@ -12,5 +12,8 @@ window.addEventListener('message', function(event) {
   if( render && event.data.result !== undefined ) {
     var result = render( event.data.result );
     event.source.postMessage( result, target );
+
+  } else if( !event.data.template ) {
+    event.source.postMessage( '', target );
   }
 });

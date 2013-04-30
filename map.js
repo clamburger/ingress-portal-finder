@@ -1,7 +1,5 @@
 var ingr, geoc, target = '*', lastd;
 
-window.oncontextmenu = function(){return false};
-
 function _ob(id){return document.getElementById(id);}
 
 function initialize() {
@@ -10,9 +8,9 @@ function initialize() {
    }
    try{
      var mapOptions = {
-       center: new google.maps.LatLng(22.528176,113.928448),
+       center: new google.maps.LatLng(-27.47281, 153.02791),
        zoom: 12,
-       mapTypeId: google.maps.MapTypeId.HYBRID
+       mapTypeId: google.maps.MapTypeId.ROADMAP
      };
      ingr = new google.maps.Map(_ob("mindon_ingr_map"),
          mapOptions);
@@ -49,6 +47,7 @@ function initialize() {
      return parent.postMessage('map-failed', target);
    }
 }
+
 
 var marker;
 window.addEventListener('message', function(event) {

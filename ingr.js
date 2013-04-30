@@ -17,6 +17,34 @@ var ck = document.cookie.match(/(^|;)\s*csrftoken=([^\s;]+)/i)
 
 var port = chrome.extension.connect({name: "ingress-air"})
   , ready = true;
+  
+  
+var n = $("#name span");
+var resistance = true;
+if (n.length) {
+  console.log("IITC detected");
+  if (n.hasClass("enl")) {
+    resistance = false;
+  }
+} else {
+  console.log("IITC not detected");
+  n = $("#player_stats").children()[1];
+  if (n != undefined && n.hasClass("ALIENS")) {
+    resistance = false;
+  }
+}
+
+if (resistance) {
+  console.log("We are the resistance.");
+} else {
+  console.log("Shaper influence detected");
+}
+
+port.postMessage(JSON.stringify({"resistance": resistance}));
+
+function sendError(error) {
+  return port.postMessage(JSON.stringify({"error": error}));
+}
 
 port.onMessage.addListener(function(bounds){
   ready = true;
@@ -29,11 +57,11 @@ port.onMessage.addListener(function(bounds){
     }
     
     if( !token ) {
-      return port.postMessage('NOAUTH');
+      return sendError("NOAUTH");
     }
     ingr( bounds );
   } else {
-    port.postMessage('INVALID');
+    sendError('INVALID');
   }
 });
 
@@ -47,7 +75,7 @@ var xhr = new XMLHttpRequest();
 xhr.onreadystatechange = function(){
   if (xhr.readyState == 4) {
     if( !ready && xhr.status != 200 || this.repsonseText == 'User not authenticated' ) // failed
-      return port.postMessage('NOAUTH');
+      return sendError('NOAUTH');
 
     var c = ''
       , resp;
@@ -55,7 +83,7 @@ xhr.onreadystatechange = function(){
       resp = JSON.parse(this.responseText);
     } catch(e){}
     if( !resp || resp.error || !resp.result || !resp.result.map[qk] ) {
-      return port.postMessage('FAILED');
+      return sendError('FAILED');
     }
     var data = resp.result.map[qk];
     port.postMessage( data );
@@ -75,7 +103,7 @@ function ingr(bounds) {
   param.boundsParamsList[0].maxLngE6 = parseInt(d[3]);
   param.boundsParamsList[0].id = qk;
   param.boundsParamsList[0].qk = qk;
-  port.postMessage('QUERYING');
+  sendError('QUERYING');
 
   xhr.open("POST", api, true);
   xhr.setRequestHeader("X-CSRFToken", token);
