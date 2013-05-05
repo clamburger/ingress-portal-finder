@@ -14,6 +14,7 @@ function initialize() {
        zoom: 12,
        mapTypeId: google.maps.MapTypeId.ROADMAP,
        streetViewControl: false,
+       panControl: false,
      };
      ingr = new google.maps.Map(_ob("google_map"),
          mapOptions);

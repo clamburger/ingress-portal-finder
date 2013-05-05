@@ -114,7 +114,21 @@ function kml(img, level) {
     });
   });
 
-  return 'data:application/vnd.google-earth.kml+xml;base64,'+Base64.encode('<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://earth.google.com/kml/2.2"><Document><name>Ingress Portals</name><open>1</open>' +styles + kmlstr +'</Document></kml>', true);
+  var now = new Date();
+  var timeStr = (now.getDate()>9?'':'0') + now.getDate() + "/" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "/" +  + now.getFullYear().toString().substr(2);
+  
+  var title;
+  if (n.length == 1) {
+    if (n[0] == 0) {
+      title = "Ingress Unclaimed Portals";
+    } else {
+      title = "Ingress Level "+n[0]+ " Portals";
+    }
+  } else {
+    title = "Ingress Portals";
+  }
+
+  return 'data:application/vnd.google-earth.kml+xml;base64,'+Base64.encode('<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://earth.google.com/kml/2.2"><Document><name>'+title+' '+timeStr+'</name><open>1</open>' +styles + kmlstr +'</Document></kml>', true);
 }
 
 function csv(img, level) {

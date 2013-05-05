@@ -2,6 +2,13 @@
 
 * Adjusted maximum area to match the error message
 * Fixed KML export
+* Zero-length locations in the filter input are now handled correctly
+* Closing the intel map now gives an error instead of querying forever
+* Resonators are now colour-coded according to their level
+ * You can also mouse-over each resonator to view energy levels
+* Replaced coloured bars with more readable information
+* Made sorting options more visible
+ * Added sort by name, which is now the default sort
 
 ## Version 1.0.1 ##
 

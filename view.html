@@ -114,38 +114,54 @@
     .neutral {
       color: silver;
     }
-
-    /*** Unsorted styles ***/
-    .status {
-      position: relative;
-      width: 64px;
-      height: 109px;
-      display: -webkit-box;
-      -webkit-box-align: baseline;
-      margin: 0 29px;
-      overflow: hidden;
-    }
-
-    .stback {
-      width: 64px;
-      height: 109px;
-      opacity: 0.2;
-      position:absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-      display: -webkit-box;
-      -webkit-box-align: baseline;
-      overflow:hidden;
-      background: transparent url(status.png) no-repeat 0 0;
-    }
-
-    .level, .energy, .links, .mods {
-      background: transparent url(status.png) no-repeat;
-      width: 15px;
-      margin-right: 1px;
+    
+    /*** Resonator colours ***/
+    .res1 {
+      color: #FECE5A;
     }
     
+    .res2 {
+      color: #FFA630;
+    }
+    
+    .res3 {
+      color: #FF7315;
+    }
+    
+    .res4 {
+      color: #E40000;
+    }
+    
+    .res5 {
+      color: #FD2992;
+    }
+    
+    .res6 {
+      color: #EB26CD;
+    }
+    
+    .res7 {
+      color: #C124E0;
+    }
+    
+    .res8 { 
+      color: #9627F4
+    }
+    
+    /*** Portal Mod colours ***/
+    .modCommon {
+      color: #84FBBD;
+    }
+    
+    .modRare {
+      color: #AD8AFF;
+    }
+    
+    .modVeryRare {
+      color: #F78AF6;
+    }
+
+    /*** Unsorted styles ***/
     #myair label.caption {
       width: 80px;
       text-align: right;
@@ -259,11 +275,11 @@
     }
 
     .a-locate {
-      width: 120px;
+      width: 140px;
       text-align: center;
     }
     .a-scene {
-      width: 150px;
+      width: 132px;
       border: 2px solid #666;
       background: transparent none no-repeat center center;
     }
@@ -404,13 +420,12 @@
       display: none;
     }
 
-    .resonators {
-      height: 2em;
-      margin-bottom: 8px;
+    #sortButtons {
+      display: inline-block;
+      position: absolute;
+      left: 8px;
     }
-
-    .note {font-size:8pt;position:absolute;left:8px;opacity:0.5}
-    .note div {display:inline-block;}
+    
     #myall { opacity: 0.2;}
 
     #mapkey {
@@ -506,15 +521,12 @@ Thanks to Niantic Labs for making this all possible</span>
   <a class="map" target="_blank" href="http://maps.google.com/maps?q=<%= list[i].nameV %>@<%= list[i].lat %>,<%= list[i].lng %>" level="<%= list[i].level %>" team="<%= list[i].team %>"></a>
   <a class="ingr" target="_blank" href="http://www.ingress.com/intel?latE6=<%= list[i].latE6 %>&lngE6=<%= list[i].lngE6 %>&z=17&pguid=<%= list[i].id %>"></a>
   </div>
-  <div class="resonators" title="Resonators"><%= list[i].resonators.join('')||'-' %></div>
-  <div class="status">
-    <div class="stback"></div>
-    <div class="level" style="height:<%= list[i].levelV %>px;background-position:0 -<%= 109-list[i].levelV %>px" title="Level"></div>
-    <div class="energy" style="height:<%= list[i].energyV %>px;background-position:-16px -<%= 109-list[i].energyV %>px" title="Energy"></div>
-    <div class="links" style="height:<%= list[i].linksV %>px;background-position:-32px -<%= 109-list[i].linksV %>px" title="Links"></div>
-    <div class="mods" style="height:<%= list[i].modsV %>px;background-position:-48px -<%= 109-list[i].modsV %>px" title="Mods"></div>
-    <div style="height:109px;font-size:1px;width:1px;"></div>
-  </div>
+  <% if (list[i].level) { %>
+  <div title="<%= list[i].energyDisplay %>">Energy: <%= list[i].energyPercentage %>%</div>
+  <div>Res: <%= list[i].resonatorDisplay.join('\n')||'-' %></div>
+  <div>Mods: <%= list[i].modDisplay.join('\n')||'-' %></div>
+  <div>Links: <%= list[i].links %></div>
+  <% } %>
       </li>
       <li class="a-scene">
   <div class="scene" style="background-image:url(<%= list[i].imageUrl %>)" u="<%= list[i].imageUrl %>"></div>

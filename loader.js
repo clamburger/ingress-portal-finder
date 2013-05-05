@@ -78,7 +78,11 @@ function query(bounds) {
     }, 100);
   }
   gbounds = bounds;
-  gport.postMessage(bounds, '*');
+  try {
+    gport.postMessage(bounds, '*');
+  } catch (e) {
+    return window.notify(JSON.stringify({error: 'DISCONNECTED'}));
+  }
 }
 
 var _BUFFER_EXPIRED = 5 * 50 * 1000;

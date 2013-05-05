@@ -1,5 +1,6 @@
 var ready, dr, portals, levels, nzlevel, teams, stat, tid, tn = 0;
 var EnergyMax = [0, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 6000 ];
+var PORTAL_MOD_STYLES = {VERY_RARE: "modVeryRare", RARE: "modRare", COMMON: "modCommon"};
 var air = chrome.extension.getBackgroundPage();
 var mapWin, center = [-27.47281, 153.02791];
 
@@ -113,8 +114,8 @@ function view( html, simple ) {
     if( mapWin ) {
       updateMap();
     }
-    $('.LevelBar div[class]').filter('.energy,.links,.mods').click(function(){
-      var key = $(this).attr('class');
+    $('#sortButtons a').click(function(){
+      var key = $(this).attr('data-sort');
       if( sortKey != key ) {
         sortKey = key;
       } else {
@@ -152,7 +153,7 @@ function view( html, simple ) {
       if(!window.csv) {
         return false;
       }
-      var now = new Date()
+      var now = new Date();
       var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate();
       var lv = $(this).attr('data-level');
       $(this).attr('download', 'Ingress-Portals-Level-'+lv+'-'+timeStr+'.csv');
@@ -165,7 +166,8 @@ var INED = '<p style="color:#fc6;font-size:10pt">If you\'re already signed in, t
 , NOTIFYS = {
   'FAILED': 'Query failed - Sign-In Required!' + INED
  ,'INVALID': 'Invalid Query!'
- ,'QUERYING': 'Querying portals, please wait...<div class="spinning"><div class="ball"></div><div class="ball1"></div></div>'
+ ,'QUERYING': 'Searching for portals, please wait...<div class="spinning"><div class="ball"></div><div class="ball1"></div></div>'
+ ,'DISCONNECTED': 'The Intel Map was closed. Try <a href="http://ingress.com/intel" target="_blank">opening it</a> and try again.<br><br>If it still doesn\'t work, close this window and re-open it.'
  ,'NOAUTH': 'Sign-In Required!' + INED
  ,'ERROR': 'Query Error! [ <a id="myreload">Reload</a> ]'
  ,'UNKNOWN': 'Unknown Error! [ <a id="myreload">Reload</a> ]'
@@ -213,6 +215,16 @@ function sort(sortKey) {
       var u = portals[a], v = portals[b], c = v.mods - u.mods;
       return !u||!v||c==0?0:(c>0?1:-1);
     };
+  } else if (sortKey == 'name') {
+    sortFn = function(a,b) {
+      var u = portals[a], v = portals[b];
+      return u.name.localeCompare(v.name);
+    };
+  } else if (sortKey == '-name') {
+    sortFn = function(a,b) {
+      var u = portals[a], v = portals[b];
+      return v.name.localeCompare(u.name);
+    };
   }
 }
 
@@ -253,6 +265,7 @@ function filter( results ) {
     var idx = levels[v];
 
     var st = {}
+    var st = {}
       , n = 0;
 
     if( idx ) {
@@ -263,7 +276,18 @@ function filter( results ) {
         title = '<b>Level '+v+'</b>';
       }
       
-      var LevelBar = '<div class="LevelBar"><div class="note"><div class="level" style="height:11px;background-position:0 -98px"></div>Level <div class="energy" style="height:11px;background-position:-16px -98px"></div>Energy <div class="links" style="height:11px;background-position:-32px -98px"></div>Links  <div class="mods" style="height:11px;background-position:-48px -98px"></div>Mods</div>'+title+' &mdash; Export <a class="export" data-level="'+v+'" title="Export KML">KML</a> or <a class="export-csv" data-level="'+v+'" title="Export Current Level as CSV">CSV</a><span class="stat" data-level="'+v+'"></span></div>';
+      var LevelBar = '<div class="LevelBar">'
+        + '<div id="sortButtons">Sort by: '
+        + '<a data-sort="name">Name</a>';
+      
+      if (v > 0) {
+        LevelBar += ', <a data-sort="energy">Energy</a>, '
+        + '<a data-sort="links">Links</a>, '
+        + '<a data-sort="mods">Mods</a>';
+      }
+      
+      LevelBar += '</div>' + title +' &mdash; Export <a class="export" data-level="'+v+'" title="Export KML">KML</a> or '
+      + '<a class="export-csv" data-level="'+v+'" title="Export Current Level as CSV">CSV</a><span class="stat" data-level="'+v+'"></span></div>';
       if( sortKey && sortFn ) {
         idx.sort(sortFn);
       }
@@ -355,7 +379,22 @@ function render() {
   if( r && r.length > 0 ) {
     dr.postMessage({result: {list: r}}, '*');
   } else {
-    view( '<div class="notify">No portals found with this level.</div>', true );
+    var msg;
+    var selected = $("#mylevels .active");
+    if (selected.length == 9) {
+      msg = "No portals found.";
+    } else if (selected.length > 1) {
+      msg = "No portals found with these levels.";
+    } else if ($(selected[0]).attr("lv") == 0) {
+      msg = "No unclaimed portals found.";
+    } else {
+      if ($(selected[0]).attr("lv") == undefined) {
+        msg = "Loading...";
+      } else {
+        msg =" No level "+$(selected[0]).attr("lv")+" portals found.";
+      }
+    }
+    view( '<div class="notify">'+msg+'</div>', true );
   }
 }
 
@@ -381,7 +420,7 @@ air.notify = function(data){
     }
 
   } else {
-    sortKey = '';
+    sortKey = 'name';
     $('#mylevels a[lv] u').html( 0 ).removeData('num');
 
     // deleted
@@ -414,7 +453,7 @@ air.notify = function(data){
           return;
         dupc[v[0]] = true;
         
-        //console.log(v);
+        console.log(v);
 
         // name, addr, lng, lat, team
         var result = {
@@ -428,10 +467,14 @@ air.notify = function(data){
          ,imageUrl: d.imageByUrl ? (d.imageByUrl.imageUrl || '').replace(/\"/g, '&quot;') : ''
          ,team: d.controllingTeam.team
          ,resonators: []
+         ,resonatorDisplay: []
+         ,modDisplay: []
          ,level: 0
          ,energy: 0
          ,energyMax: 0
+         ,energyDisplay: ""
          ,links: 0
+         ,fields: 0
          ,mods: 0
         };
 
@@ -442,20 +485,51 @@ air.notify = function(data){
           d.resonatorArray.resonators.forEach(function(r){
             if( !r ) {
               result.resonators[i++] = "-";
+              result.resonatorDisplay[i++] = "<span class='res0' title='No resonator'>-</span>";
               return;
             }
             var level = r.level || 0;
+            var energyPercentage = Math.ceil(r.energyTotal / EnergyMax[level] * 100);
             result.resonators[i++] = level;
+            result.resonatorDisplay[i++] = "<span class='res"+level+"' title='"+energyPercentage+"%'>"+level+"</span>";
             result.level += level;
             result.energy += r ? r.energyTotal : 0
 
             result.energyMax += EnergyMax[level] || 0;
           });
         }
+        
+        // portal mods
+        i = 0;
+        if ( d.portalV2 && d.portalV2.linkedModArray ) {
+        
+          d.portalV2.linkedModArray.forEach(function(mod) {
+            if (!mod) {
+              result.modDisplay[i++] = "<span title='No portal mod'>-</span>";
+              return;
+            }
+            
+            if (mod.type != "RES_SHIELD") {
+              result.modDisplay[i++] = "<span title='Unknown portal mod: "+mod.displayName+"'>?</span>";
+              return;
+            }
+            
+            var className = PORTAL_MOD_STYLES[mod.rarity];
+            var rarity = mod.rarity.charAt(0) + mod.rarity.slice(1).toLowerCase();
+            result.modDisplay[i++] = "<span title='"+rarity+" "+mod.displayName+"' class='"+className+"'>"+mod.rarity[0]+"</span>";
+            
+          });
+        
+        }
 
         result.level = result.level ? Math.max(Math.floor(result.level/8), 1) : 0;
         result.energyLevel = result.energyMax ? Math.floor(result.energy * 100 / result.energyMax) : 0;
         result.energyIndex = Math.floor(result.energyLevel/20);
+        
+        if (result.level > 0) {
+          result.energyDisplay = result.energy + " / " + result.energyMax;
+          result.energyPercentage = Math.ceil(result.energy / result.energyMax * 100);
+        }
 
         if( !vs[result.level] ) {
           vs[result.level] = {};
@@ -468,6 +542,7 @@ air.notify = function(data){
               result.links += deleted[ l.edgeGuid ] ? 0 : 1;
             });
           }
+          
           if( d.portalV2.linkedModArray ) {
             d.portalV2.linkedModArray.forEach(function(m) {
               result.mods += m ? 1 : 0;
@@ -521,6 +596,7 @@ air.notify = function(data){
     }
 
     $('#mytotal').html( total );
+    sort("name");
     render();
   }
 };
