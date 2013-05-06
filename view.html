@@ -53,8 +53,12 @@
       font-weight: bold;
     }
     
-    body.aliens .tron, body.aliens #mystage, body.aliens .ui-tooltip {
+    body.aliens .tron, body.aliens #mystage, body.aliens .ui-tooltip, body.aliens #exportDialog {
       border-color: #60B120;
+    }
+    
+    body.aliens .ui-tooltip, body.aliens #exportDialog {
+      background-color: rgba(13, 78, 8, 0.9);
     }
 
     /*** Area and Filter inputs ***/
@@ -394,10 +398,7 @@
       top: 0;
       right: 10px;
     }
-    .export {
-    }
-    .export:hover {
-    }
+
     .total {position:absolute;right:0;bottom:4px;line-height:1em;font-size:8pt;}
 
 
@@ -454,21 +455,14 @@
 
     #mycurr {color:#cc0;}
 
-    #myexport {
+    #exportDialog {
       position: absolute;
-      border: 1px solid white;
-      background-color: #000;
-      color: #f00;
-      border-radius: 6px;
+      text-align: center;
       padding: 8px 16px;
       z-index: 99;
-    }
-    #myexport a {
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    #myexport a:hover {
-      color: #ff0;
+      
+      background-color: rgba(8, 48, 78, 0.9);
+      border: 1px solid #20A8B1;
     }
     h1 sup {
       font-size: 50%;
@@ -623,9 +617,9 @@ Thanks to Niantic Labs for making this all possible</span>
     background: transparent url(max.png) no-repeat 0 0;
   }
   </style>
-  <div id="myexport" style="display:none">
-    <a target="_blank" id="exportCurrent">Level 0</a> &nbsp; | &nbsp; <a target="_blank" title="Export all portals">All</a>
-    <input type="checkbox" id="withimage" checked title="Include portal photos" />
+  <div id="exportDialog" style="display:none">
+    <a target="_blank" id="exportCurrent">Level 0</a> &nbsp; | &nbsp; <a target="_blank" title="Export all portals">All</a><br>
+    <input type="checkbox" id="withimage" checked /> Include photos
   </div>
   <div id="myrange" style="display:none"></div>
   <div id="mymap" style="display:none">

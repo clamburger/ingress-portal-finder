@@ -105,9 +105,9 @@ function kml(img, level) {
         kmlstr += '<Placemark><name>' + vxml(l.name) +'</name><description><![CDATA[<table>';
         kmlstr += '<tr><td style="color:'+colors[l.team]+'"><p>'+vxml(l.addr)+'</p><ul><li>Resonators: ' +vxml(l.resonators.join('') || '-') +'</li>';
         kmlstr += '<li>Level: '+(0+l.level)+'</li>';
-        kmlstr += '<li>Energy: '+(0+l.energyLevel)+'</li>';
+        kmlstr += '<li>Energy: '+(0+l.energyLevel)+'%</li>';
         kmlstr += '<li>Links: '+(0+l.links)+'</li>';
-        kmlstr += '<li>Mods: '+(0+l.mods)+'</li></ul>';
+        kmlstr += '<li>Mods: '+vxml(l.modArray.join('') || '-')+'</li></ul>';
         kmlstr += '</td>'+(img?'<td width="120"><div style="background-position:center center;background-size:contain;background-repeat: no-repeat;width:120px;height: 160px;background-image:url('+l.imageUrl+')"></div></td>':'')+'</tr></table>';
         kmlstr += ']]></description><styleUrl>#'+l.team+'</styleUrl><Point><coordinates>'+l.lng+','+l.lat+',0</coordinates></Point></Placemark>';
       }
@@ -186,7 +186,7 @@ function csv(img, level) {
         csvstr += ',"'+(0+l.level)+'"';
         csvstr += ',"'+(0+l.energyLevel)+'"';
         csvstr += ',"'+(0+l.links)+'"';
-        csvstr += ',"'+(0+l.mods)+'"';
+        csvstr += '," '+vxml(l.modArray.join(''))+'"';
         csvstr += '," '+vxml(l.resonators.join('') || '-')+'"';
         if (img) {
           csvstr += ',"'+(l.imageUrl||'')+'"';

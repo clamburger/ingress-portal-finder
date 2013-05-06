@@ -196,7 +196,7 @@ function view( html, simple ) {
         $('#exportCurrent').attr('title', "Export only level "+level+" portals");
       }
 
-      $('#myexport')
+      $('#exportDialog')
         .attr('data-level', level)
         .attr('data-format', $(this).attr('data-format'))
         .css({left: event.pageX, top: event.pageY})
@@ -309,8 +309,8 @@ function filter( results ) {
   stat = {};
   vsc = {};
 
-  n.forEach(function(v){
-    var idx = levels[v];
+  n.forEach(function(level){
+    var idx = levels[level];
 
     var st = {}
     var st = {}
@@ -318,27 +318,27 @@ function filter( results ) {
 
     if( idx ) {
       var title;
-      if (v == 0) {
+      if (level == 0) {
         title = '<b>Unclaimed</b>';
       } else {
-        title = '<b>Level '+v+'</b>';
+        title = '<b>Level '+level+'</b>';
       }
       
       var LevelBar = '<div class="LevelBar">'
         + '<div id="sortButtons">Sort by: '
         + '<a data-sort="name">Name</a>';
       
-      if (v > 0) {
+      if (level > 0) {
         LevelBar += ', <a data-sort="energy">Energy</a>, '
         + '<a data-sort="links">Links</a>, '
         + '<a data-sort="mods">Mods</a>';
       }
       
       LevelBar += '</div>' + title + ' &mdash; '
-        + '<span id="exportLinks" data-level="'+v+'">Export '
+        + '<span id="exportLinks" data-level="'+level+'">Export '
         + '<a data-format="kml" title="Export KML">KML</a> or '
         + '<a data-format="csv" title="Export CSV">CSV</a></span>'
-        + '<span class="stat" data-level="'+v+'"></span></div>';
+        + '<span class="stat" data-level="'+level+'"></span></div>';
       if( sortKey && sortFn ) {
         idx.sort(sortFn);
       }
@@ -351,14 +351,6 @@ function filter( results ) {
 
         if( valid && matched && same ) {
           l.nameV = (l.name||'').replace(/\"/g, '&quot;');
-          // preapre data for view template
-          l.levelV = (l.level +1) * 11;
-          l.energyV = Math.ceil( l.energyLevel * 0.98 ) +11;
-          if( l.energyV > 109 )
-            l.energyV = 109;
-
-          l.linksV = (l.links +1) * 11;
-          l.modsV = (l.mods +1) * 11;
           l.addrV = krxp ? (l.addr||'').replace(/</g, '&lt;').replace(krxp, '<b class="hightlight">$1</b>') : (l.addr||'').replace(/</g, '&lt;');
 
           if( LevelBar ) {
@@ -385,9 +377,9 @@ function filter( results ) {
       });
     }
 
-    num[v] = n;
+    num[level] = n;
 
-    stat[v] = st;
+    stat[level] = st;
 
   });
 
@@ -527,6 +519,7 @@ air.notify = function(data){
          ,links: 0
          ,fields: 0
          ,mods: 0
+         ,modArray: []
         };
 
         // resonators
@@ -608,6 +601,7 @@ air.notify = function(data){
           if( d.portalV2.linkedModArray ) {
             d.portalV2.linkedModArray.forEach(function(m) {
               result.mods += m ? 1 : 0;
+              result.modArray.push(m ? m.rarity[0] : "-");
             });
           }
         }
@@ -795,7 +789,7 @@ $(document).ready(function(){
     mapWin && mapWin.postMessage({key: $('#mymapkey').val().replace(/^\s+|\s+$/g, '')}, '*');
   });
 
-  $('#myexport a').click(function(){
+  $('#exportDialog a').click(function(){
     var level = $(this).parent().attr('data-level');
     var format = $(this).parent().attr('data-format');
     
@@ -852,9 +846,9 @@ $(document).click(function(event){
     $('#mymap').hide();
   if( $('#myrange:visible').length )
     $('#myrange').hide();
-  if( $('#myexport:visible').length ) {
+  if( $('#exportDialog:visible').length ) {
     if(!event.target||event.target.id!='withimage')
-      $('#myexport').hide();
+      $('#exportDialog').hide();
   }
   return true;
 });
