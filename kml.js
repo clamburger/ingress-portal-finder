@@ -155,7 +155,7 @@ function csv(img, level) {
     t.push('NEUTRAL');
   }
 
-  var csvstr = '"Team","Level","Name","Address","Energy %","Links","Mods","Resonators",';
+  var csvstr = '"Portal ID","Latitude","Longitude","Name","Address","Team","Level","Energy Percentage","Links","Mods","Resonators",';
   if (img) {
     csvstr += "Photo URL";
   }
@@ -177,14 +177,17 @@ function csv(img, level) {
         , same = t.length ? t.indexOf(l.team) > -1 : false;
 
       if( valid && matched && same ) {
-        csvstr += '"'+(l.team=='ALIENS'?'ENLIGHTENED':l.team)+'"';
-        csvstr += ',"'+(0+l.level)+'"';
+        csvstr += '"'+l.id+'"';
+        csvstr += ',"'+l.lat+'"';
+        csvstr += ',"'+l.lng+'"';
         csvstr += ',"'+l.name.replace(/\"/g, '\'\'')+'"';
         csvstr += ',"'+l.addr.replace(/\"/g, '\'\'')+'"';
+        csvstr += ',"'+(l.team=='ALIENS'?'ENLIGHTENED':l.team)+'"';
+        csvstr += ',"'+(0+l.level)+'"';
         csvstr += ',"'+(0+l.energyLevel)+'"';
         csvstr += ',"'+(0+l.links)+'"';
         csvstr += ',"'+(0+l.mods)+'"';
-        csvstr += ',"'+vxml(l.resonators.join('') || '-')+'"';
+        csvstr += '," '+vxml(l.resonators.join('') || '-')+'"';
         if (img) {
           csvstr += ',"'+(l.imageUrl||'')+'"';
         }
