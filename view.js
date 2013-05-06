@@ -184,38 +184,28 @@ function view( html, simple ) {
       render();
     });
 
-    $('.LevelBar .export').click(function(event){
-      if(!window.kml) {
-        return false;
-      }
-
-      var offset = $(this).offset()
-        , lv = $(this).attr('data-level');
+    $('#exportLinks a').click(function(event){
+      window.level = $(this);
+      var level = $(this).parent().attr('data-level');
         
-      if (lv == 0) {
+      if (level == 0) {
         $('#exportCurrent').html( "Unclaimed" );
         $('#exportCurrent').attr('title', "Export only unclaimed portals");
       } else {
-        $('#exportCurrent').html( "Level " + lv );
-        $('#exportCurrent').attr('title', "Export only level "+lv+" portals");
+        $('#exportCurrent').html( "Level " + level );
+        $('#exportCurrent').attr('title', "Export only level "+level+" portals");
       }
 
-      $('#myexport').attr('data-level', lv).css({left: event.pageX, top: event.pageY}).show();
+      $('#myexport')
+        .attr('data-level', level)
+        .attr('data-format', $(this).attr('data-format'))
+        .css({left: event.pageX, top: event.pageY})
+        .show();
 
       event.stopPropagation();
       event.stopImmediatePropagation();
       event.preventDefault();
       return false;
-    });
-    $('.LevelBar .export-csv').click(function(event){
-      if(!window.csv) {
-        return false;
-      }
-      var now = new Date();
-      var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate();
-      var lv = $(this).attr('data-level');
-      $(this).attr('download', 'Ingress-Portals-Level-'+lv+'-'+timeStr+'.csv');
-      $(this).attr('href', csv(true, lv));
     });
   }
 }
@@ -344,8 +334,11 @@ function filter( results ) {
         + '<a data-sort="mods">Mods</a>';
       }
       
-      LevelBar += '</div>' + title +' &mdash; Export <a class="export" data-level="'+v+'" title="Export KML">KML</a> or '
-      + '<a class="export-csv" data-level="'+v+'" title="Export Current Level as CSV">CSV</a><span class="stat" data-level="'+v+'"></span></div>';
+      LevelBar += '</div>' + title + ' &mdash; '
+        + '<span id="exportLinks" data-level="'+v+'">Export '
+        + '<a data-format="kml" title="Export KML">KML</a> or '
+        + '<a data-format="csv" title="Export CSV">CSV</a></span>'
+        + '<span class="stat" data-level="'+v+'"></span></div>';
       if( sortKey && sortFn ) {
         idx.sort(sortFn);
       }
@@ -803,21 +796,18 @@ $(document).ready(function(){
   });
 
   $('#myexport a').click(function(){
-    window.butt = $(this);
-    var lv = $(this).parent().attr('data-level');
-    if( !lv ) {
-      console.log($(this));
-      return $(this).removeAttr('href');
-    }
+    var level = $(this).parent().attr('data-level');
+    var format = $(this).parent().attr('data-format');
+    
     var now = new Date();
     var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate();
+    
     if( $(this).html() == 'All' ) {
-      console.log("All");
-      $(this).attr('download', 'Ingress-Portals-'+timeStr+'.kml');
-      $(this).attr('href', kml($('#withimage:checked').length>0));
+      $(this).attr('download', 'Ingress-Portals-'+timeStr+'.'+format);
+      $(this).attr('href', window[format]($('#withimage:checked').length>0));
     } else {
-      $(this).attr('download', 'Ingress-Portals-Level-'+lv+'-'+timeStr+'.kml');
-      $(this).attr('href', kml($('#withimage:checked').length>0,lv));
+      $(this).attr('download', 'Ingress-Portals-Level-'+level+'-'+timeStr+'.'+format);
+      $(this).attr('href', window[format]($('#withimage:checked').length>0,level));
     }
   });
 

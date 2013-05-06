@@ -1,6 +1,7 @@
 ## Development Version ##
 
 * Improved tooltips
+* CSV export now has the same options as KML export
 
 ## Version 1.0.2 ##
 
