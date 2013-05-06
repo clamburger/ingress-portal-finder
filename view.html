@@ -53,11 +53,7 @@
       font-weight: bold;
     }
     
-    body.aliens .tron {
-      border-color: #60B120;
-    }
-    
-    body.aliens #mystage {
+    body.aliens .tron, body.aliens #mystage, body.aliens .ui-tooltip {
       border-color: #60B120;
     }
 
@@ -159,6 +155,23 @@
     
     .modVeryRare {
       color: #F78AF6;
+    }
+    
+    /*** Tooltip ***/
+    
+    .ui-tooltip {
+      max-width: 300px;
+      background-color: rgba(8, 48, 78, 0.9);
+      border: 1px solid #20A8B1;
+      color: #FFCE00;
+      position: absolute;
+      z-index: 9999;
+      padding: 2px 4px;
+      font: 13px/15px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    }
+    
+    .hover {
+      cursor: help;
     }
 
     /*** Unsorted styles ***/
@@ -466,7 +479,7 @@
     </style>
   </head>
   <body>
-  <h1>Ingress Portal Finder (Über Edition) <sup id="version"></sup></h1>
+  <h1 title="Isn't it awesome?">Ingress Portal Finder (Über Edition) <sup id="version"></sup></h1>
   <p id="alien-msg">Enlightened player detected - your shaper influence is not welcome here &gt;:-(</p>
   <div id="myair">
     <ul>
@@ -482,7 +495,7 @@
       
       <li>
         <label class="caption">
-          <abbr title="Comma seperated list of locations">Filter:</abbr>
+          <abbr class="hover" title="Comma seperated list of locations">Filter:</abbr>
         </label>
         <input type="text" id="mykey" class="tron" value="" title="" placeholder="Fortitude Valley, Cleveland, ..." />
         <div id="myteam" class="tron">
@@ -540,6 +553,7 @@ Thanks to Niantic Labs for making this all possible</span>
   </textarea>
   <iframe src="tmpl.html" style="display:none;width:1px;height:1px" frameBorder="0"></iframe>
   <script src="jquery.js"></script>
+  <script src="jquery-ui.js"></script>
   <script src="view.js"></script>
   <style>
   #mymap {

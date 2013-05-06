@@ -36,6 +36,7 @@
   "content_scripts": [{
     "js": [
       "jquery.js",
+      "jquery-ui.js",
       "ingr.js"
     ],
     "matches": [

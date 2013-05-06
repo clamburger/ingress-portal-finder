@@ -20,7 +20,7 @@ function tabClicked(tab) {
 
     chrome.tabs.executeScript(tab.id, { file: "ingr.js", runAt: 'document_start' });
 
-    chrome.windows.create({'url': 'view.html', 'type': 'popup', 'width': 720, 'height':570, 'focused': true}
+    chrome.windows.create({'url': 'view.html', 'type': 'popup', 'width': 1040, 'height':540, 'focused': true}
     , function(chromeWindow) {
       win = chromeWindow.tabs[0];
     });

@@ -1,3 +1,7 @@
+## Development Version ##
+
+* Improved tooltips
+
 ## Version 1.0.2 ##
 
 * Adjusted maximum area to match the error message

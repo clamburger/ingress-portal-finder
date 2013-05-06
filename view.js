@@ -1,12 +1,70 @@
 var ready, dr, portals, levels, nzlevel, teams, stat, tid, tn = 0;
 var EnergyMax = [0, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 6000 ];
 var PORTAL_MOD_STYLES = {VERY_RARE: "modVeryRare", RARE: "modRare", COMMON: "modCommon"};
+var OCTANTS = ["E", "NE", "N", "NW", "W", "SW", "S", "SE"];
 var air = chrome.extension.getBackgroundPage();
 var mapWin, center = [-27.47281, 153.02791];
 
 var vs = {}, vsc = {}, sortKey;
 
 $("#version").html("v"+chrome.app.getDetails().version);
+
+String.prototype.capitalize = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
+}
+
+window.setupTooltips = function(element) {
+  element = element || $(document);
+  element.tooltip({
+    // disable show/hide animation
+    show: { effect: "hide", duration: 0 } ,
+    hide: false,
+    open: function(event, ui) {
+      ui.tooltip.delay(500).fadeIn(0);
+    },
+    position: { my: "left top+5" },
+    content: function() {
+      var title = $(this).attr('title');
+      return window.convertTextToTableMagic(title);
+    }
+  });
+
+  if(!window.tooltipClearerHasBeenSetup) {
+    window.tooltipClearerHasBeenSetup = true;
+    $(document).on('click', '.ui-tooltip', function() { $(this).remove(); });
+  }
+}
+
+window.convertTextToTableMagic = function(text) {
+  // check if it should be converted to a table
+  if(!text.match(/\t/)) return text.replace(/\n/g, '<br>');
+
+  var data = [];
+  var columnCount = 0;
+
+  // parse data
+  var rows = text.split('\n');
+  $.each(rows, function(i, row) {
+    data[i] = row.split('\t');
+    if(data[i].length > columnCount) columnCount = data[i].length;
+  });
+
+  // build the table
+  var table = '<table>';
+  $.each(data, function(i, row) {
+    table += '<tr>';
+    $.each(data[i], function(k, cell) {
+      var attributes = '';
+      if(k === 0 && data[i].length < columnCount) {
+        attributes = ' colspan="'+(columnCount - data[i].length + 1)+'"';
+      }
+      table += '<td'+attributes+'>'+cell+'</td>';
+    });
+    table += '</tr>';
+  });
+  table += '</table>';
+  return table;
+}
 
 window.addEventListener('message', function(event) {
   if( event.data == 'render-ready' ) {
@@ -124,7 +182,7 @@ function view( html, simple ) {
       sort( sortKey );
 
       render();
-    }).css('cursor', 'pointer').attr('title', 'Click to sort');
+    });
 
     $('.LevelBar .export').click(function(event){
       if(!window.kml) {
@@ -485,13 +543,18 @@ air.notify = function(data){
           d.resonatorArray.resonators.forEach(function(r){
             if( !r ) {
               result.resonators[i++] = "-";
-              result.resonatorDisplay[i++] = "<span class='res0' title='No resonator'>-</span>";
+              result.resonatorDisplay[i] = "<span class='hover res0' title='octant: "+OCTANTS[i-1]+"'>-</span>";
               return;
             }
             var level = r.level || 0;
-            var energyPercentage = Math.ceil(r.energyTotal / EnergyMax[level] * 100);
+            var energyPercentage = Math.round(r.energyTotal / EnergyMax[level] * 100);
             result.resonators[i++] = level;
-            result.resonatorDisplay[i++] = "<span class='res"+level+"' title='"+energyPercentage+"%'>"+level+"</span>";
+            
+            var title = "energy:\t"+r.energyTotal+" / "+EnergyMax[level]+" ("+energyPercentage+"%)"
+              + "\nlevel:\t"+level
+              + "\ndistance:\t"+r.distanceToPortal+"m"
+              + "\noctant:\t"+OCTANTS[r.slot];
+            result.resonatorDisplay[i++] = "<span class='hover res"+level+"' title='"+title+"'>"+level+"</span>";
             result.level += level;
             result.energy += r ? r.energyTotal : 0
 
@@ -505,18 +568,24 @@ air.notify = function(data){
         
           d.portalV2.linkedModArray.forEach(function(mod) {
             if (!mod) {
-              result.modDisplay[i++] = "<span title='No portal mod'>-</span>";
+              result.modDisplay[i++] = "<span>-</span>";
               return;
             }
             
             if (mod.type != "RES_SHIELD") {
-              result.modDisplay[i++] = "<span title='Unknown portal mod: "+mod.displayName+"'>?</span>";
+              result.modDisplay[i++] = "<span class='hover' title='Unknown portal mod: "+mod.displayName+"'>?</span>";
               return;
             }
             
             var className = PORTAL_MOD_STYLES[mod.rarity];
-            var rarity = mod.rarity.charAt(0) + mod.rarity.slice(1).toLowerCase();
-            result.modDisplay[i++] = "<span title='"+rarity+" "+mod.displayName+"' class='"+className+"'>"+mod.rarity[0]+"</span>";
+            var title = mod.rarity.capitalize() + ' ' + mod.displayName
+              + "\nStats:";
+            for (var key in mod.stats) {
+              if (!mod.stats.hasOwnProperty(key)) continue;
+              title += '\n+' + mod.stats[key] + ' ' + key.capitalize();
+            }
+            
+            result.modDisplay[i++] = "<span title='"+title+"' class='hover "+className+"'>"+mod.rarity[0]+"</span>";
             
           });
         
@@ -528,7 +597,7 @@ air.notify = function(data){
         
         if (result.level > 0) {
           result.energyDisplay = result.energy + " / " + result.energyMax;
-          result.energyPercentage = Math.ceil(result.energy / result.energyMax * 100);
+          result.energyPercentage = Math.round(result.energy / result.energyMax * 100);
         }
 
         if( !vs[result.level] ) {
@@ -752,6 +821,8 @@ $(document).ready(function(){
     }
   });
 
+  window.setupTooltips();
+  
 });
 
 function updateMap() {
