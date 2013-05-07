@@ -101,6 +101,11 @@ function ingr(bounds) {
   param.boundsParamsList[0].minLngE6 = parseInt(d[1]);
   param.boundsParamsList[0].maxLatE6 = parseInt(d[2]);
   param.boundsParamsList[0].maxLngE6 = parseInt(d[3]);
+  if( Math.abs(parseFloat(d[0]) - parseFloat(d[2])) > 1.2 * Math.pow(10, 6)
+    || Math.abs(parseFloat(d[1]) - parseFloat(d[3])) > 1.8 * Math.pow(10, 6)) {
+    console.log(d[0],d[2],d[1],d[3]);
+    return sendError('RANGE');
+  }
   param.boundsParamsList[0].id = qk;
   param.boundsParamsList[0].qk = qk;
   sendError('QUERYING');

@@ -4,6 +4,7 @@ var PORTAL_MOD_STYLES = {VERY_RARE: "modVeryRare", RARE: "modRare", COMMON: "mod
 var OCTANTS = ["E", "NE", "N", "NW", "W", "SW", "S", "SE"];
 var air = chrome.extension.getBackgroundPage();
 var mapWin, center = [-27.47281, 153.02791];
+var autoDownload = false;
 
 var vs = {}, vsc = {}, sortKey;
 
@@ -213,9 +214,11 @@ function view( html, simple ) {
 var INED = '<p style="color:#fc6;font-size:10pt">If you\'re already signed in, try pressing "Query" again or perform the following steps: <br/>1) close this window; &nbsp; &nbsp; &nbsp;<br/>2) reload the /intel page;<br/>3) re-open this window. &nbsp;</ol></p>'
 , NOTIFYS = {
   'FAILED': 'Query failed - Sign-In Required!' + INED
- ,'INVALID': 'Invalid Query!'
+ ,'INVALID': 'Invalid query! Check your coordinates and try again.'
  ,'QUERYING': 'Searching for portals, please wait...<div class="spinning"><div class="ball"></div><div class="ball1"></div></div>'
  ,'DISCONNECTED': 'The Intel Map was closed. Try <a href="http://ingress.com/intel" target="_blank">opening it</a> and try again.<br><br>If it still doesn\'t work, close this window and re-open it.'
+ ,'TIMEOUT': 'Portal search timed out. Make sure the <a href="http://ingress.com/intel" target="_blank">Intel Map</a> is open and try again.'
+ ,'RANGE': 'The range you specified was too large.<br><br>There can be a maximum of 1.2 difference in latitude and 1.8 difference in longitude.'
  ,'NOAUTH': 'Sign-In Required!' + INED
  ,'ERROR': 'Query Error! [ <a id="myreload">Reload</a> ]'
  ,'UNKNOWN': 'Unknown Error! [ <a id="myreload">Reload</a> ]'
@@ -226,6 +229,12 @@ function fail( data ) {
   $('#myreload').click(function(){
     window.location.reload();
   });
+  if (autoDownload && (data == 'TIMEOUT' || data == 'DISCONNECTED')) {
+    console.log("Intel map not open. Let's open it ourselves. ");
+    var a = $("<a href='http://ingress.com/intel' target='_blank'></a>");
+    a[0].click();
+    setTimeout(function() { window.location.reload(); }, 5000);
+  }
   if( data != 'QUERYING' ) {
     $('#submitQuery').get(0).disabled = false;
   }
@@ -496,7 +505,7 @@ air.notify = function(data){
           return;
         dupc[v[0]] = true;
         
-        console.log(v);
+        //console.log(v);
 
         // name, addr, lng, lat, team
         var result = {
@@ -620,6 +629,7 @@ air.notify = function(data){
 
         n += 1;
       });
+      
     }
 
     portals = results;
@@ -654,6 +664,19 @@ air.notify = function(data){
     $('#mytotal').html( total );
     sort("name");
     render();
+    
+    if (autoDownload) {      
+      var now = new Date();
+      var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate()
+        + "-" + (now.getHours()>9?'':'0') + now.getHours() + "-" + (now.getMinutes()>9?'':'0') + now.getMinutes();;
+      
+      localStorage["download-"+timeStr] = csv(true);
+      localStorage["new-download-available"] = true;  
+      
+      air.gpack = null;
+      window.location = "/view.html";
+    }
+    
   }
 };
 
@@ -704,6 +727,7 @@ $(document).ready(function(){
     }
 
     var bounds = ($('#mymin').val() +',' +$('#mymax').val()).replace(/\s+/g, '');
+    console.log(bounds);
     var m = bounds.split(/\s*,\s*/);
     if( Math.abs(parseFloat(m[0]) - parseFloat(m[2])) > 1.2
       || Math.abs(parseFloat(m[1])-parseFloat(m[3])) > 1.8 ) {
@@ -804,8 +828,52 @@ $(document).ready(function(){
       $(this).attr('href', window[format]($('#withimage:checked').length>0,level));
     }
   });
+  
+  if (localStorage.getItem("new-download-available") != null) {
+    var div = $("<div class='localStorage'><ul><li>New download available:</li></ul></div>");
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key.substring(0, 8) == "download") {
+        var date = key.substring(9);
+        $(div.children()[0]).append("<li><a download='Ingress-Portals-"+date+".csv' href='"+localStorage[key]+"'>"+date+"</a></li>");
+      }
+    }
+    
+    var a = $("<a>[dismiss]</a>");
+    a.click(function(event) {
+      localStorage.removeItem("new-download-available");
+      $(".localStorage").remove();
+    });
+    $(div.children()[0]).append($("<li></li>").append(a));
+    
+    a = $("<a>[remove all]</a>");
+    a.click(function(event) {
+      localStorage.removeItem("new-download-available");
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key.substring(0, 8) == "download") {
+          localStorage.removeItem(key);
+        }
+      }
+      $(".localStorage").remove();
+    });
+    $(div.children()[0]).append($("<li></li>").append(a));
+    
+    $("h1").after(div);
+  }
 
   window.setupTooltips();
+  
+  if (window.location.search.substring(0, 10) == "?download=") {
+    autoDownload = true;
+    var bounds = window.location.search.substring(10);
+    console.log(bounds);
+    
+    fail('QUERYING');
+    air.qn = 0;
+    air.gpack = null;
+    air.query( bounds );
+  }
   
 });
 

@@ -9,7 +9,7 @@ Installation
 -------------------
 
 1. Download the [.crx file](https://raw.github.com/clamburger/ingress-portal-finder/master/build/ingress-portal-finder.crx) to your machine
-2. Open [chrome://extensions](chrome://extensions)
+2. Open chrome://extensions
 3. Drag the .crx file you download onto the extensions page
 
 Once installed, the extension should stay automatically updated.
@@ -21,4 +21,4 @@ Usage
 
 Update History
 -------------------
-The current version is **1.0.2**. See [CHANGELOG.md](CHANGELOG.md) for details.
+The current version is **1.0.2**. See [docs/CHANGELOG.md](docs/CHANGELOG.md) for details.

@@ -70,7 +70,7 @@ function query(bounds) {
 
     if( qn == 100 ) {
       qn = 0;
-      return window.notify && window.notify('FAILED');
+      return window.notify && window.notify(JSON.stringify({error: 'TIMEOUT'}));
     }
 
     return setTimeout(function(){
