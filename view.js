@@ -233,7 +233,7 @@ function fail( data ) {
     console.log("Intel map not open. Let's open it ourselves. ");
     var a = $("<a href='http://ingress.com/intel' target='_blank'></a>");
     a[0].click();
-    setTimeout(function() { window.location.reload(); }, 5000);
+    setTimeout(function() { startAutoDownload(); }, 5000);
   }
   if( data != 'QUERYING' ) {
     $('#submitQuery').get(0).disabled = false;
@@ -687,7 +687,8 @@ air.notify = function(data){
               localStorage["download-"+timeStr] = fileEntry.toURL();
               localStorage["new-download-available"] = true;  
               air.gpack = null;
-              window.location = "/view.html";
+              window.open('', '_self', '');
+              window.close();
             };
           });
         });
@@ -875,16 +876,16 @@ $(document).ready(function(){
   });
   
   if (localStorage.getItem("new-download-available") != null) {
-    var div = $("<div class='localStorage'><ul><li>New download available:</li></ul></div>");
+    var div = $("<div class='localStorage'><ul><li>New download available: </li></ul></div>");
     for (var i = 0; i < localStorage.length; i++) {
       var key = localStorage.key(i);
       if (key.substring(0, 8) == "download") {
         var date = key.substring(9);
-        $(div.children()[0]).append("<li><a download='Ingress-Portals-"+date+".json' href='"+localStorage[key]+"'>"+date+"</a></li>");
+        $(div.children()[0]).append("<li><a download='Ingress-Portals-"+date+".json' href='"+localStorage[key]+"'>"+date+"</a> | </li>");
       }
     }
     
-    a = $("<a>[remove all]</a>");
+    a = $("<a>remove all</a>");
     a.click(function(event) {
       localStorage.removeItem("new-download-available");
       for (var i = 0; i < localStorage.length; i++) {
@@ -927,17 +928,21 @@ $(document).ready(function(){
   window.setupTooltips();
   
   if (window.location.search.substring(0, 10) == "?download=") {
-    autoDownload = true;
-    var bounds = window.location.search.substring(10);
-    console.log(bounds);
-    
-    fail('QUERYING');
-    air.qn = 0;
-    air.gpack = null;
-    air.query( bounds );
+    startAutoDownload();
   }
   
 });
+
+function startAutoDownload() {
+  autoDownload = true;
+  var bounds = window.location.search.substring(10);
+  console.log(bounds);
+  
+  fail('QUERYING');
+  air.qn = 0;
+  air.gpack = null;
+  air.query( bounds );
+}
 
 function updateMap() {
   $('a.map[href]').each(function(){
