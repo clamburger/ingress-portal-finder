@@ -7,7 +7,9 @@
   
   "permissions": [
     "http://www.ingress.com/*",
-    "https://www.ingress.com/*"
+    "https://www.ingress.com/*",
+    "geolocation",
+    "unlimitedStorage"
   ],
   
   "browser_action": {

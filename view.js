@@ -345,8 +345,9 @@ function filter( results ) {
       
       LevelBar += '</div>' + title + ' &mdash; '
         + '<span id="exportLinks" data-level="'+level+'">Export '
-        + '<a data-format="kml" title="Export KML">KML</a> or '
-        + '<a data-format="csv" title="Export CSV">CSV</a></span>'
+        + '<a data-format="kml" title="Export KML">KML</a>, '
+        + '<a data-format="csv" title="Export CSV">CSV</a> or '
+        + '<a data-format="json" title="Export JSON">JSON</a></span>'
         + '<span class="stat" data-level="'+level+'"></span></div>';
       if( sortKey && sortFn ) {
         idx.sort(sortFn);
@@ -518,6 +519,7 @@ air.notify = function(data){
          ,lat: d.locationE6.latE6.toString().replace(dE6, '.$1')
          ,imageUrl: d.imageByUrl ? (d.imageByUrl.imageUrl || '').replace(/\"/g, '&quot;') : ''
          ,team: d.controllingTeam.team
+         ,rawInfo: d
          ,resonators: []
          ,resonatorDisplay: []
          ,modDisplay: []
@@ -534,6 +536,8 @@ air.notify = function(data){
         // resonators
         var i = 0;
         if( d.resonatorArray && d.resonatorArray.resonators ) {
+        
+          result.rawResonators = d.resonatorArray.resonators;
         
           d.resonatorArray.resonators.forEach(function(r){
             if( !r ) {
@@ -670,11 +674,25 @@ air.notify = function(data){
       var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate()
         + "-" + (now.getHours()>9?'':'0') + now.getHours() + "-" + (now.getMinutes()>9?'':'0') + now.getMinutes();;
       
-      localStorage["download-"+timeStr] = csv(true);
-      localStorage["new-download-available"] = true;  
+      var result = exportPortals("json", true);
+      var localFilename;
+
+      window.webkitRequestFileSystem(window.TEMPORARY, 10*1024*1024, function(fs) {
+        fs.root.getFile("auto-download-"+timeStr+".json", {create: true}, function(fileEntry) {
+          fileEntry.createWriter(function(fileWriter) {
+            var blob = new Blob([result.data], {type: result.mime});
+            fileWriter.write(blob);
+            
+            fileWriter.onwriteend = function() {
+              localStorage["download-"+timeStr] = fileEntry.toURL();
+              localStorage["new-download-available"] = true;  
+              air.gpack = null;
+              window.location = "/view.html";
+            };
+          });
+        });
+      });
       
-      air.gpack = null;
-      window.location = "/view.html";
     }
     
   }
@@ -820,13 +838,40 @@ $(document).ready(function(){
     var now = new Date();
     var timeStr = now.getFullYear() + "-" + (now.getMonth()>8?'':'0') + (now.getMonth()+1) + "-" + (now.getDate()>9?'':'0') + now.getDate();
     
+    var result, filename;
+    
     if( $(this).html() == 'All' ) {
-      $(this).attr('download', 'Ingress-Portals-'+timeStr+'.'+format);
-      $(this).attr('href', window[format]($('#withimage:checked').length>0));
+      filename = 'Ingress-Portals-'+timeStr+'.'+format;
+      result = exportPortals(format, $('#withimage:checked').length > 0);
     } else {
-      $(this).attr('download', 'Ingress-Portals-Level-'+level+'-'+timeStr+'.'+format);
-      $(this).attr('href', window[format]($('#withimage:checked').length>0,level));
+      filename = 'Ingress-Portals-Level-'+level+'-'+timeStr+'.'+format;
+      result = exportPortals(format, $('#withimage:checked').length > 0, level);
     }
+    
+    var localFilename;
+    
+    window.webkitRequestFileSystem(window.TEMPORARY, 10*1024*1024, function(fs) {
+      var dirReader = fs.root.createReader();
+      var entries = [];
+      
+      var readEntries
+      
+      fs.root.getFile(filename, {create: true}, function(fileEntry) {
+      
+        fileEntry.createWriter(function(fileWriter) {
+          var blob = new Blob([result.data], {type: result.mime});
+          
+          fileWriter.onwriteend = function() {
+            var a = $("<a download='"+filename+"' href='"+fileEntry.toURL()+"' target='_blank'></a>");
+            a[0].click();
+          };
+          
+          fileWriter.write(blob);
+          localFilename = fileEntry.toURL();
+        });
+      });
+    });
+    
   });
   
   if (localStorage.getItem("new-download-available") != null) {
@@ -835,16 +880,9 @@ $(document).ready(function(){
       var key = localStorage.key(i);
       if (key.substring(0, 8) == "download") {
         var date = key.substring(9);
-        $(div.children()[0]).append("<li><a download='Ingress-Portals-"+date+".csv' href='"+localStorage[key]+"'>"+date+"</a></li>");
+        $(div.children()[0]).append("<li><a download='Ingress-Portals-"+date+".json' href='"+localStorage[key]+"'>"+date+"</a></li>");
       }
     }
-    
-    var a = $("<a>[dismiss]</a>");
-    a.click(function(event) {
-      localStorage.removeItem("new-download-available");
-      $(".localStorage").remove();
-    });
-    $(div.children()[0]).append($("<li></li>").append(a));
     
     a = $("<a>[remove all]</a>");
     a.click(function(event) {
@@ -855,6 +893,30 @@ $(document).ready(function(){
           localStorage.removeItem(key);
         }
       }
+      
+      function toArray(list) {
+        return Array.prototype.slice.call(list || [], 0);
+      }
+      
+      window.webkitRequestFileSystem(window.TEMPORARY, 10*1024*1024, function(fs) {
+        var dirReader = fs.root.createReader();
+        var entries = [];
+        
+        var readEntries = function() {
+          dirReader.readEntries (function(results) {
+            console.log(results.length);
+            if (results.length) {
+              for (var i = 0; i < results.length; i++) {
+                results[i].remove(function(){});
+              }
+              readEntries();
+            }
+          });
+        };
+        
+        readEntries();
+      });
+      
       $(".localStorage").remove();
     });
     $(div.children()[0]).append($("<li></li>").append(a));
