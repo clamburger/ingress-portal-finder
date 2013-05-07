@@ -21,4 +21,4 @@ Usage
 
 Update History
 -------------------
-The current version is **1.0.2**. See [docs/CHANGELOG.md](docs/CHANGELOG.md) for details.
+The current version is **1.0.3**. See [docs/CHANGELOG.md](docs/CHANGELOG.md) for details.

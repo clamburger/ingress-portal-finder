@@ -1,7 +1,9 @@
-## Development Version ##
+## Version 1.0.3 ##
 
 * Improved tooltips
 * CSV export now has the same options as KML export
+* Added JSON export
+* Added automatic downloader (see [docs/autoDownloader.md](docs/autoDownloader.md))
 
 ## Version 1.0.2 ##
 

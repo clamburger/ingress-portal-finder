@@ -3,7 +3,7 @@
   
   "name": "Ingress Portal Finder (Über Edition)",
   "description": "Locates portals in Ingress.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   
   "permissions": [
     "http://www.ingress.com/*",
