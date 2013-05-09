@@ -479,47 +479,84 @@ air.notify = function(data){
     // deleted
     var deleted = {};
     
-    if( data.deletedGameEntityGuids ) {
-      data.deletedGameEntityGuids.forEach(function(v){
-        deleted[v] = true;
-      });
-    }
+    // Parts of this entity-loading code from IITC
+    // https://github.com/jonatkins/ingress-intel-total-conversion/blob/master/code/map_data.js
+    
+    $.each( data.deletedGameEntityGuids || [], function(index, guid) {
+      deleted[guid] = true;
+      
+      // If a field has been deleted, remove that field from every portal it is attached to
+      if (getTypeByGuid(guid) === TYPE_FIELD && window.fields[guid] !== undefined) {
+        $.each(window.fields[guid].options.vertices, function(ind, vertex) {
+          if (window.portals[vertex.guid] === undefined) return true;
+          fieldArray = window.portals[vertex.guid].options.details.portalV2.linkedFields;
+          fieldArray.splice($.inArray(guid, fieldArray), 1);
+        });
+      }
+    });
+    
+    // Mapping of portals to connected fields
+    var p2f = {};
+    
+    // Delayed portal processing
+    var ppp = {};
 
     // entities
     if( data.gameEntities ) {
-      var results = []
-        , dE6 = /(\d{6})$/
-        , n = 0;
+      var results = [], n = 0;
 
       // reset global data
       air.portals = portals = [];
       levels = {};
       teams = {};
-
-      var dupc = {}; //avoid duplicate
-
-      data.gameEntities.forEach(function(v) {
-        var d = v[2];
-
-        // skip
-        if(!d || deleted[v[0]] || !d.resonatorArray || dupc[v[0]])
-          return;
-        dupc[v[0]] = true;
+      
+      $.each(data.gameEntities || [], function(index, entity) {
+        // entity = [GUID, id(?), details]
+                
+        var GUID = entity[0];
+        var details = entity[2];
         
-        //console.log(v);
-
-        // name, addr, lng, lat, team
+        if (deleted[GUID]) {
+          console.log("skipped deleted entity",GUID);
+          return;
+        }
+        
+        if (details.capturedRegion !== undefined) {
+          $.each(details.capturedRegion, function(index, vertex) {
+            if (p2f[vertex.guid] === undefined)
+              p2f[vertex.guid] = new Array();
+            p2f[vertex.guid].push(GUID);
+          });
+          return;
+        }
+        
+        if (details.turret === undefined) {
+          console.log("skipped non-portal entity",entity[0]);
+          return;
+        }
+        
+        ppp[GUID] = entity;
+      
+      });
+    
+      $.each(ppp, function(index, portal) {
+      
+        var d = portal[2];
+        
+        var GUID = portal[0];
+        var details = portal[2];
+    
         var result = {
-          id: v[0],
+          id: GUID,
           name: d.portalV2 && d.portalV2.descriptiveText ? d.portalV2.descriptiveText.TITLE || 'No Name' : 'No Name'
          ,addr: d.portalV2 && d.portalV2.descriptiveText ? d.portalV2.descriptiveText.ADDRESS || '-' : '-'
          ,lngE6: d.locationE6.lngE6
          ,latE6: d.locationE6.latE6
-         ,lng: d.locationE6.lngE6.toString().replace(dE6, '.$1')
-         ,lat: d.locationE6.latE6.toString().replace(dE6, '.$1')
+         ,lng: d.locationE6.lngE6 / 1E6
+         ,lat: d.locationE6.latE6 / 1E6
          ,imageUrl: d.imageByUrl ? (d.imageByUrl.imageUrl || '').replace(/\"/g, '&quot;') : ''
          ,team: d.controllingTeam.team
-         ,rawInfo: d
+         ,rawInfo: portal
          ,resonators: []
          ,resonatorDisplay: []
          ,modDisplay: []
@@ -532,6 +569,10 @@ air.notify = function(data){
          ,mods: 0
          ,modArray: []
         };
+        
+        if (p2f[GUID] !== undefined) {
+          result.fields = p2f[GUID].length;
+        }
 
         // resonators
         var i = 0;
@@ -888,11 +929,16 @@ $(document).ready(function(){
     a = $("<a>remove all</a>");
     a.click(function(event) {
       localStorage.removeItem("new-download-available");
+      var toRemove = [];
       for (var i = 0; i < localStorage.length; i++) {
         var key = localStorage.key(i);
         if (key.substring(0, 8) == "download") {
-          localStorage.removeItem(key);
+          toRemove.push(key);
         }
+      }
+      
+      for (var i = 0; i < toRemove.length; i++) {
+        localStorage.removeItem(toRemove[i]);
       }
       
       function toArray(list) {

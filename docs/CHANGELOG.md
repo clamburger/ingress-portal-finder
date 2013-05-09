@@ -1,3 +1,9 @@
+## Development Version ##
+
+* JSON export now contains portal IDs
+* Fixed the "remove all" button not actually removing all
+* Added number of fields to portal information
+
 ## Version 1.0.3 ##
 
 * Improved tooltips
