@@ -1,7 +1,5 @@
 var ready, dr, portals, levels, nzlevel, teams, stat, tid, tn = 0;
-var EnergyMax = [0, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 6000 ];
 var PORTAL_MOD_STYLES = {VERY_RARE: "modVeryRare", RARE: "modRare", COMMON: "modCommon"};
-var OCTANTS = ["E", "NE", "N", "NW", "W", "SW", "S", "SE"];
 var air = chrome.extension.getBackgroundPage();
 var mapWin, center = [-27.47281, 153.02791];
 var autoDownload = false;
@@ -9,63 +7,6 @@ var autoDownload = false;
 var vs = {}, vsc = {}, sortKey;
 
 $("#version").html("v"+chrome.app.getDetails().version);
-
-String.prototype.capitalize = function() {
-  return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
-}
-
-window.setupTooltips = function(element) {
-  element = element || $(document);
-  element.tooltip({
-    // disable show/hide animation
-    show: { effect: "hide", duration: 0 } ,
-    hide: false,
-    open: function(event, ui) {
-      ui.tooltip.delay(500).fadeIn(0);
-    },
-    position: { my: "left top+5" },
-    content: function() {
-      var title = $(this).attr('title');
-      return window.convertTextToTableMagic(title);
-    }
-  });
-
-  if(!window.tooltipClearerHasBeenSetup) {
-    window.tooltipClearerHasBeenSetup = true;
-    $(document).on('click', '.ui-tooltip', function() { $(this).remove(); });
-  }
-}
-
-window.convertTextToTableMagic = function(text) {
-  // check if it should be converted to a table
-  if(!text.match(/\t/)) return text.replace(/\n/g, '<br>');
-
-  var data = [];
-  var columnCount = 0;
-
-  // parse data
-  var rows = text.split('\n');
-  $.each(rows, function(i, row) {
-    data[i] = row.split('\t');
-    if(data[i].length > columnCount) columnCount = data[i].length;
-  });
-
-  // build the table
-  var table = '<table>';
-  $.each(data, function(i, row) {
-    table += '<tr>';
-    $.each(data[i], function(k, cell) {
-      var attributes = '';
-      if(k === 0 && data[i].length < columnCount) {
-        attributes = ' colspan="'+(columnCount - data[i].length + 1)+'"';
-      }
-      table += '<td'+attributes+'>'+cell+'</td>';
-    });
-    table += '</tr>';
-  });
-  table += '</table>';
-  return table;
-}
 
 window.addEventListener('message', function(event) {
   if( event.data == 'render-ready' ) {
@@ -531,7 +472,7 @@ air.notify = function(data){
         }
         
         if (details.turret === undefined) {
-          console.log("skipped non-portal entity",entity[0]);
+          //console.log("skipped non-portal entity",entity[0]);
           return;
         }
         
@@ -545,6 +486,12 @@ air.notify = function(data){
         
         var GUID = portal[0];
         var details = portal[2];
+    
+        if (p2f[GUID] !== undefined) {
+          details.portalV2['linkedFields'] = uniqueArray(p2f[GUID]);
+        } else {
+          details.portalV2['linkedFields'] = [];
+        }
     
         var result = {
           id: GUID,
@@ -565,14 +512,10 @@ air.notify = function(data){
          ,energyMax: 0
          ,energyDisplay: ""
          ,links: 0
-         ,fields: 0
+         ,fields: details.portalV2['linkedFields'].length
          ,mods: 0
          ,modArray: []
         };
-        
-        if (p2f[GUID] !== undefined) {
-          result.fields = p2f[GUID].length;
-        }
 
         // resonators
         var i = 0;
@@ -587,10 +530,10 @@ air.notify = function(data){
               return;
             }
             var level = r.level || 0;
-            var energyPercentage = Math.round(r.energyTotal / EnergyMax[level] * 100);
+            var energyPercentage = Math.round(r.energyTotal / RESO_NRG[level] * 100);
             result.resonators[i++] = level;
             
-            var title = "energy:\t"+r.energyTotal+" / "+EnergyMax[level]+" ("+energyPercentage+"%)"
+            var title = "energy:\t"+r.energyTotal+" / "+RESO_NRG[level]+" ("+energyPercentage+"%)"
               + "\nlevel:\t"+level
               + "\ndistance:\t"+r.distanceToPortal+"m"
               + "\noctant:\t"+OCTANTS[r.slot];
@@ -598,7 +541,7 @@ air.notify = function(data){
             result.level += level;
             result.energy += r ? r.energyTotal : 0
 
-            result.energyMax += EnergyMax[level] || 0;
+            result.energyMax += RESO_NRG[level] || 0;
           });
         }
         

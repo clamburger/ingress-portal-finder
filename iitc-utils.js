@@ -198,3 +198,9 @@ window.getTypeByGuid = function(guid) {
       return TYPE_UNKNOWN;
   }
 }
+
+window.uniqueArray = function(arr) {
+  return $.grep(arr, function(v, i) {
+    return $.inArray(v, arr) === i;
+  });
+}
