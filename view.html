@@ -541,7 +541,7 @@ Thanks to Niantic Labs for making this all possible</span>
       <li class="a-locate">
   <div class="point">
   <a class="map" target="_blank" href="http://maps.google.com/maps?q=<%= list[i].nameV %>@<%= list[i].lat %>,<%= list[i].lng %>" level="<%= list[i].level %>" team="<%= list[i].team %>"></a>
-  <a class="ingr" target="_blank" href="http://www.ingress.com/intel?latE6=<%= list[i].latE6 %>&lngE6=<%= list[i].lngE6 %>&z=17&pguid=<%= list[i].id %>"></a>
+  <a class="ingr" target="_blank" href="http://www.ingress.com/intel?ll=<%= list[i].lat + "," + list[i].lng %>&z=17&pll=<%= list[i].lat + "," + list[i].lng %>"></a>
   </div>
   <% if (list[i].level) { %>
   <div title="<%= list[i].energyDisplay %>">Energy: <%= list[i].energyPercentage %>%</div>

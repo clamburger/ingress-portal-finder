@@ -91,8 +91,10 @@ function view( html, simple ) {
         } else {
         var c = (st['ALIENS']||0) + (st['RESISTANCE']||0) +(st['NEUTRAL']||0);
 
-        $(this).html('<span class="enlightened" title="Enlightened portals">'+alien+'</span> + '
-          + '<span class="resistance" title="Resistance portals">'+resist+'</span> = '+c+' portal'+s(c));
+        var title = "<span class='resistance'>"+resist+" Resistance portal"+s(resist)+"</span>\n"
+          + "<span class='enlightened'>"+alien+" Enlightened portal"+s(alien)+"</span>\n";
+        $(this).html('<span title="'+title+'" class="hover"><span class="resistance">'+resist+'</span> + '
+          + '<span class="enlightened">'+alien+'</span> = '+c+' portal'+s(c)+"</span>");
         }
         
       } else {
