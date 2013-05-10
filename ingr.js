@@ -18,7 +18,6 @@ var ck = document.cookie.match(/(^|;)\s*csrftoken=([^\s;]+)/i)
 var port = chrome.extension.connect({name: "ingress-air"})
   , ready = true;
   
-  
 var n = $("#name span");
 var resistance = true;
 if (n.length) {
@@ -91,6 +90,7 @@ xhr.onreadystatechange = function(){
 };
 
 function ingr(bounds) {
+  console.log("Hello world!", window.MAX_RANGE_HEIGHT);
   if( xhr.readyState && xhr.readyState != 4 ) {
     xhr.abort();
   }
@@ -101,8 +101,8 @@ function ingr(bounds) {
   param.boundsParamsList[0].minLngE6 = parseInt(d[1]);
   param.boundsParamsList[0].maxLatE6 = parseInt(d[2]);
   param.boundsParamsList[0].maxLngE6 = parseInt(d[3]);
-  if( Math.abs(parseFloat(d[0]) - parseFloat(d[2])) > 1.2 * Math.pow(10, 6)
-    || Math.abs(parseFloat(d[1]) - parseFloat(d[3])) > 1.8 * Math.pow(10, 6)) {
+  if( Math.abs(parseFloat(d[0]) - parseFloat(d[2])) > MAX_RANGE_HEIGHT * Math.pow(10, 6)
+    || Math.abs(parseFloat(d[1]) - parseFloat(d[3])) > MAX_RANGE_WIDTH * Math.pow(10, 6)) {
     console.log(d[0],d[2],d[1],d[3]);
     return sendError('RANGE');
   }

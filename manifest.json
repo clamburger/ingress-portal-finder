@@ -39,6 +39,7 @@
     "js": [
       "jquery.js",
       "jquery-ui.js",
+      "iitc-utils.js",
       "ingr.js"
     ],
     "matches": [

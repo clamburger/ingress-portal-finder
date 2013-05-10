@@ -44,8 +44,8 @@ function updateBounds( data ) {
   }
   d = data.bounds;
   if( d && d.length == 2 ) {
-    if( Math.abs(d[1][0] - d[0][0]) > 1.2
-      || Math.abs(d[1][1] - d[0][1]) > 1.8 ) {
+    if( Math.abs(d[1][0] - d[0][0]) > window.MAX_RANGE_HEIGHT
+      || Math.abs(d[1][1] - d[0][1]) > window.MAX_RANGE_WIDTH) {
       $('#myrange').show();
     }
 
@@ -161,7 +161,7 @@ var INED = '<p style="color:#fc6;font-size:10pt">If you\'re already signed in, t
  ,'QUERYING': 'Searching for portals, please wait...<div class="spinning"><div class="ball"></div><div class="ball1"></div></div>'
  ,'DISCONNECTED': 'The Intel Map was closed. Try <a href="http://ingress.com/intel" target="_blank">opening it</a> and try again.<br><br>If it still doesn\'t work, close this window and re-open it.'
  ,'TIMEOUT': 'Portal search timed out. Make sure the <a href="http://ingress.com/intel" target="_blank">Intel Map</a> is open and try again.'
- ,'RANGE': 'The range you specified was too large.<br><br>There can be a maximum of 1.2 difference in latitude and 1.8 difference in longitude.'
+ ,'RANGE': 'The range you specified was too large.<br><br>There can be a maximum of '+window.MAX_RANGE_HEIGHT+' difference in latitude and '+window.MAX_RANGE_WIDTH+' difference in longitude.'
  ,'NOAUTH': 'Sign-In Required!' + INED
  ,'ERROR': 'Query Error! [ <a id="myreload">Reload</a> ]'
  ,'UNKNOWN': 'Unknown Error! [ <a id="myreload">Reload</a> ]'
@@ -734,8 +734,8 @@ $(document).ready(function(){
     var bounds = ($('#mymin').val() +',' +$('#mymax').val()).replace(/\s+/g, '');
     console.log(bounds);
     var m = bounds.split(/\s*,\s*/);
-    if( Math.abs(parseFloat(m[0]) - parseFloat(m[2])) > 1.2
-      || Math.abs(parseFloat(m[1])-parseFloat(m[3])) > 1.8 ) {
+    if( Math.abs(parseFloat(m[0]) - parseFloat(m[2])) > window.MAX_RANGE_HEIGHT
+      || Math.abs(parseFloat(m[1])-parseFloat(m[3])) > window.MAX_RANGE_WIDTH ) {
       $('#myrange').show();
       return false;
     }

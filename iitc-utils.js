@@ -30,6 +30,9 @@ window.links = {};
 window.fields = {};
 window.resonators = {};
 
+window.MAX_RANGE_HEIGHT = 1.2;
+window.MAX_RANGE_WIDTH = 1.8;
+
 String.prototype.capitalize = function() {
   return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
 } 
@@ -43,10 +46,6 @@ window.getPortalLevel = function (d) {
     hasReso = true;
   });
   return hasReso ? Math.max(1, lvl/8) : 0;
-}
-
-window.getPlayerName = function (playerGUID) {
-  return "KindredSprites";
 }
 
 window.prettyEnergy = function (nrg) {
