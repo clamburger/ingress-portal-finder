@@ -1,8 +1,10 @@
-## Development Version ##
+## Version 1.0.4 ##
 
 * JSON export now contains portal IDs
 * Fixed the "remove all" button not actually removing all
 * Added number of fields to portal information
+* The range of the portal finder is now variable (not currently exposed in the GUI, so you have to edit iitc-utils.js)
+* Fixed bug in Chrome 29+ (evs38)
 
 ## Version 1.0.3 ##
 
