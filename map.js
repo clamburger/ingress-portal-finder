@@ -53,7 +53,7 @@ function initialize() {
         var sw = bounds.getSouthWest();
         var ne = bounds.getNorthEast();
         
-        if (Math.abs(ne.lat()-sw.lat()) > 1.2 || Math.abs(ne.lng()-sw.lng()) > 1.8) {
+        if (Math.abs(ne.lat()-sw.lat()) > window.MAX_RANGE_HEIGHT || Math.abs(ne.lng()-sw.lng()) > window.MAX_RANGE_WIDTH) {
           _ob('searchError').innerHTML = "Area too large. Try zooming in.";
         } else {
           _ob('searchError').innerHTML = "";
